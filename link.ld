@@ -20,7 +20,7 @@ SECTIONS {
 
     .bss ALIGN (0x1000) :    /* bss sections */
     {
-        COMMON               /* all COMMON sections from all files */
+        *(COMMON)               /* all COMMON sections from all files */
         *(.bss)              /* all bss sections from all files */
     }
 }
