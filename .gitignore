@@ -2,3 +2,4 @@ kernel.elf
 
 loader.o
 
+*.o
