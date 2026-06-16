@@ -44,6 +44,13 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
     fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
 }
 
+void printf(const char* str)
+{
+    for (unsigned int i = 0; str[i] != '\0'; i++){
+        fb_write_cell(i*22, str[i], FB_GREEN, FB_DARK_GREY);
+    }
+}
+
 void kmain() {
     // Example usage from the book
     fb_write_cell(0, 'A', FB_GREEN, FB_DARK_GREY);
