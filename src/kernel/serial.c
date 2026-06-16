@@ -1,5 +1,5 @@
 #include "io.h" /* io.h is implement in the section "Moving the cursor" */
-
+#include "serial.h"
 /* The I/O ports */
 
 /* All the I/O ports are calculated relative to the data port. This is because

@@ -1,4 +1,5 @@
 #include "io.h"
+#include "serial.h"
 
 /* The I/O ports */
 #define FB_COMMAND_PORT         0x3D4
