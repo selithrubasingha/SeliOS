@@ -30,4 +30,6 @@ void serial_write_char(char c);
  */
 void serial_write_string(const char* str);
 
+void serial_init();
+
 #endif /* INCLUDE_SERIAL_H */

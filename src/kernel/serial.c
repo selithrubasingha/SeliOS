@@ -71,6 +71,18 @@ int serial_is_transmit_fifo_empty(unsigned int com)
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
 
+/** serial_init:
+ * Configures the serial port to 38400 baud, 8 data bits, no parity, 
+ * one stop bit, and enables the FIFO buffers and modem ready lines.
+ */
+void serial_init()
+{
+    serial_configure_baud_rate(SERIAL_COM1_BASE, 3);
+    serial_configure_line(SERIAL_COM1_BASE);
+    serial_configure_buffers(SERIAL_COM1_BASE);
+    serial_configure_modem(SERIAL_COM1_BASE);
+}
+
 void serial_write_char(char c){
     while (serial_is_transmit_fifo_empty(SERIAL_COM1_BASE)  == 0){
 

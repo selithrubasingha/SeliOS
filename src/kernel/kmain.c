@@ -68,9 +68,10 @@ void printf(int device ,const char* str)
 }
 
 void kmain() {
-    // Example usage from the book
-    fb_write_cell(0, 'A', FB_GREEN, FB_DARK_GREY);
+    serial_init();
     
-    // Move cursor to the next cell (position 1)
-    fb_move_cursor(1);
+    printf(DEVICE_FB, "SeliOS Screen Router is ONLINE!\n");
+    
+    printf(DEVICE_SERIAL, "SeliOS Serial Router is ONLINE!\n");
+
 }
