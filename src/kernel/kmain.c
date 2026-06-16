@@ -1,27 +1,52 @@
-// Define some basic color codes for the VGA text mode
-#define FB_BLACK 0
-#define FB_GREEN 2
+#include "io.h"
+
+/* The I/O ports */
+#define FB_COMMAND_PORT         0x3D4
+#define FB_DATA_PORT            0x3D5
+
+/* The I/O port commands */
+#define FB_HIGH_BYTE_COMMAND    14
+#define FB_LOW_BYTE_COMMAND     15
+
+// Colors from the example
+#define FB_GREEN     2
+#define FB_DARK_GREY 8
+
+// Global framebuffer pointer (with volatile to prevent compiler optimization)
+volatile char *fb = (volatile char *) 0x000B8000;
+
+/** fb_move_cursor:
+ * Moves the cursor of the framebuffer to the given position
+ *
+ * @param pos The new position of the cursor
+ */
+void fb_move_cursor(unsigned short pos)
+{
+    outb(FB_COMMAND_PORT, FB_HIGH_BYTE_COMMAND);
+    outb(FB_DATA_PORT,    ((pos >> 8) & 0x00FF));
+    outb(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
+    outb(FB_DATA_PORT,    pos & 0x00FF);
+}
+
+/** fb_write_cell:
+ * Writes a character with the given foreground and background to position i
+ * in the framebuffer.
+ *
+ * @param i  The location in the framebuffer
+ * @param c  The character
+ * @param fg The foreground color
+ * @param bg The background color
+ */
+void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
+{
+    fb[i] = c;
+    fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
+}
 
 void kmain() {
-    // Create a pointer to the exact physical address of the VGA framebuffer
-    char *fb = (char *) 0x000B8000;
-
-    // Write the letter 'S' to the first slot on the screen
-    fb[0] = 'S';
+    // Example usage from the book
+    fb_write_cell(0, 'A', FB_GREEN, FB_DARK_GREY);
     
-    // Write the color for the 'S' (Green text on Black background)
-    // The bitwise math combines the foreground and background colors into one byte
-    fb[1] = ((FB_BLACK & 0x0F) << 4) | (FB_GREEN & 0x0F);
-
-    // Write the letter 'E' to the second slot
-    fb[2] = 'E';
-    fb[3] = ((FB_BLACK & 0x0F) << 4) | (FB_GREEN & 0x0F);
-
-    // Write the letter 'L' to the third slot
-    fb[4] = 'L';
-    fb[5] = ((FB_BLACK & 0x0F) << 4) | (FB_GREEN & 0x0F);
-
-    // Write the letter 'I' to the fourth slot
-    fb[6] = 'I';
-    fb[7] = ((FB_BLACK & 0x0F) << 4) | (FB_GREEN & 0x0F);
+    // Move cursor to the next cell (position 1)
+    fb_move_cursor(1);
 }
