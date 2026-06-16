@@ -80,7 +80,7 @@ void serial_write_char(char c){
 }
 
 void serial_write_string(const char* str){
-    for (size_t i = 0; str[i] != '\0'; i++){
+    for (unsigned int i = 0; str[i] != '\0'; i++){
         serial_write_char(str[i]);
     }
 }
