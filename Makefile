@@ -8,7 +8,7 @@ LDFLAGS = -T link.ld -melf_i386
 
 ASFLAGS = -f elf32
 
-OBJECTS = src/kernel/loader.o src/kernel/kmain.o src/kernel/io.o 
+OBJECTS = src/kernel/loader.o src/kernel/kmain.o src/kernel/io.o  src/kernel/serial.o
 
 # targets
  
@@ -24,7 +24,7 @@ kernel.elf: $(OBJECTS)
 	$(AS) $(ASFLAGS) $< -o $@
 
 run: kernel.elf
-	qemu-system-x86_64 -kernel kernel.elf
+	qemu-system-x86_64 -kernel kernel.elf -serial stdio
 
 clean:
 	rm -f $(OBJECTS) kernel.elf

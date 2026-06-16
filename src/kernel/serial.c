@@ -71,6 +71,22 @@ int serial_is_transmit_fifo_empty(unsigned int com)
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
 
+/** serial_configure_buffers:
+ * Enable FIFO, clear buffers, with a 14-byte queue
+ */
+void serial_configure_buffers(unsigned short com)
+{
+    outb(SERIAL_FIFO_COMMAND_PORT(com), 0xC7);
+}
+
+/** serial_configure_modem:
+ * Tells the modem we are ready to transmit data
+ */
+void serial_configure_modem(unsigned short com)
+{
+    outb(SERIAL_MODEM_COMMAND_PORT(com), 0x0B);
+}
+
 /** serial_init:
  * Configures the serial port to 38400 baud, 8 data bits, no parity, 
  * one stop bit, and enables the FIFO buffers and modem ready lines.
@@ -79,8 +95,8 @@ void serial_init()
 {
     serial_configure_baud_rate(SERIAL_COM1_BASE, 3);
     serial_configure_line(SERIAL_COM1_BASE);
-    serial_configure_buffers(SERIAL_COM1_BASE);
     serial_configure_modem(SERIAL_COM1_BASE);
+    serial_configure_buffers(SERIAL_COM1_BASE);
 }
 
 void serial_write_char(char c){
