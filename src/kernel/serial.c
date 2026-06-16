@@ -70,3 +70,17 @@ int serial_is_transmit_fifo_empty(unsigned int com)
     /* 0x20 = 0010 0000 */
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
+
+void serial_write_char(char c){
+    while (serial_is_transmit_fifo_empty(SERIAL_COM1_BASE)  == 0){
+
+    }
+
+    outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), c);
+}
+
+void serial_write_string(const char* str){
+    for (size_t i = 0; str[i] != '\0'; i++){
+        serial_write_char(str[i]);
+    }
+}
