@@ -8,7 +8,7 @@ LDFLAGS = -T link.ld -melf_i386
 
 ASFLAGS = -f elf32
 
-OBJECTS = src/kernel/loader.o src/kernel/kmain.o 
+OBJECTS = src/kernel/loader.o src/kernel/kmain.o src/kernel/io.o 
 
 # targets
  
