@@ -1,6 +1,9 @@
 #include "io.h"
 #include "serial.h"
 
+#define DEVICE_FB     0
+#define DEVICE_SERIAL 1
+
 /* The I/O ports */
 #define FB_COMMAND_PORT         0x3D4
 #define FB_DATA_PORT            0x3D5
@@ -15,6 +18,8 @@
 
 // Global framebuffer pointer (with volatile to prevent compiler optimization)
 volatile char *fb = (volatile char *) 0x000B8000;
+
+unsigned int cursor_pos = 0;
 
 /** fb_move_cursor:
  * Moves the cursor of the framebuffer to the given position
@@ -43,11 +48,22 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
     fb[i] = c;
     fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
 }
-
-void printf(const char* str)
+void putchar(int device, char c) {
+    if (device == DEVICE_SERIAL) {
+        serial_write_char(c);
+    } 
+    else if (device == DEVICE_FB) {
+        fb_write_cell(cursor_pos * 2, c, FB_GREEN, FB_DARK_GREY);
+        
+        cursor_pos++;
+        
+        fb_move_cursor(cursor_pos);
+    }
+}
+void printf(int device ,const char* str)
 {
     for (unsigned int i = 0; str[i] != '\0'; i++){
-        fb_write_cell(i*22, str[i], FB_GREEN, FB_DARK_GREY);
+        putchar(device, str[i]);
     }
 }
 
