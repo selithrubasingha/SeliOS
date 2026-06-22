@@ -25,5 +25,19 @@ void set_entry(int index, unsigned int base, unsigned int limit, unsigned char a
     gdt_entries[index].access      = access;
 }
 
+void init_gdt() {
+    // 1. Set up the book's pointer struct
+    gdt_ptr.size = (sizeof(struct gdt_entry) * 5) - 1;
+    gdt_ptr.address  = (unsigned int)&gdt_entries;
 
+    // 2. Build the 5 flat-model rules
+    set_entry(0, 0, 0, 0, 0);                // Null
+    set_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Kernel Code
+    set_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Kernel Data
+    set_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User Code
+    set_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User Data
+
+    // 3. Trigger the assembly code!
+    load_gdt((unsigned int)&gdt_ptr);
+}
 
