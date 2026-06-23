@@ -56,3 +56,19 @@ unsigned char read_scan_code(void)
 {
     return inb(KBD_DATA_PORT);
 }
+
+void keyboard_handler(){
+    unsigned char scan_code = read_scan_code();
+
+    if (scan_code & 0x80) {
+        return;
+}   
+    char ascii = kbd_US[scan_code];
+
+
+    if (ascii != 0) {
+        // Use your serial_write or fb_write to print the character
+        char str[2] = {ascii, '\0'}; // Create a string with the character and null terminator
+        serial_write(str);
+    }
+}
