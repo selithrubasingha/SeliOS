@@ -1,5 +1,5 @@
 #include "io.h"
-
+#include "keyboard.h"
 #define KBD_DATA_PORT 0x60
 
 /* KBDUS means US Keyboard Layout. This is a scancode table

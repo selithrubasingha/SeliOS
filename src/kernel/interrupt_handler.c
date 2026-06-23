@@ -1,4 +1,6 @@
 #include "interrupt_handler.h"
+#include "keyboard.h"
+#include "pic.h"
 
 void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_state stack) {
     // The CPU is paused. Decide what to do based on 'intr_no'
@@ -8,8 +10,8 @@ void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_
         // Then loop infinitely to halt the OS so it doesn't execute broken code.
     }
     else if (intr_no == 33) {
-        // The Keyboard interrupted us!
-        // keyboard_handler(); // (You will write this in Phase 5!)
+        keyboard_handler();       // 1. Read the key and print it
+        pic_acknowledge(intr_no); // 2. CRUCIAL: Thank the PIC secretary!
     }
     else if (intr_no >= 32 && intr_no <= 47) {
         // It's a hardware interrupt, but not the keyboard.

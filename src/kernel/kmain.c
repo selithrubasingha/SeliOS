@@ -1,5 +1,7 @@
 #include "io.h"
 #include "serial.h"
+#include "idt.h"
+#include "pic.h"
 
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
@@ -69,9 +71,13 @@ void printf(int device ,const char* str)
 
 void kmain() {
     serial_init();
+    init_idt(); // 1. Setup the emergency phonebook
+    pic_init(); // 2. Remap the hardware secretary
     
     printf(DEVICE_FB, "SeliOS Screen Router is ONLINE!\n");
     
     printf(DEVICE_SERIAL, "SeliOS Serial Router is ONLINE!\n");
 
 }
+
+asm volatile("sti"); // STI stands for "Set Interrupt flag"
