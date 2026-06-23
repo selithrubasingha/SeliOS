@@ -10,6 +10,7 @@
 #define PIC2_START_INTERRUPT 0x28 // 40
 #define PIC2_END_INTERRUPT   0x2F // 47
 
+//inpurrupt acknowledge command OR EOI (End of Interrupt)
 #define PIC_ACK 0x20
 
 void pic_init();
