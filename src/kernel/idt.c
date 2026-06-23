@@ -17,5 +17,11 @@ void set_idt_gate(int index, unsigned int base, unsigned short sel, unsigned cha
 }
 
 void init_idt() {
+    // 1. Set up the book's pointer struct
+    idt_ptr.size = (sizeof(struct idt_entry) * 256) - 1;
+    idt_ptr.address  = (unsigned int)&idt_entries;
+    
+    // 2. Trigger the assembly code!
+    load_idt((unsigned int)&idt_ptr);
 }
 
