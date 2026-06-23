@@ -44,3 +44,5 @@ struct stack_state {
     unsigned int cs;            // Pushed by the CPU hardware
     unsigned int eflags;        // Pushed by the CPU hardware
 } __attribute__((packed));
+
+void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_state stack) ;
