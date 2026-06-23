@@ -6,8 +6,8 @@
 
 
 struct gdt {
-    unsigned int address;
     unsigned short size;
+    unsigned int address;
 } __attribute__((packed));
 
 void init_gdt();
