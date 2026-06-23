@@ -62,3 +62,5 @@ common_interrupt_handler:               ; the common parts of the generic interr
 no_error_code_interrupt_handler 0       ; create handler for interrupt 0
 no_error_code_interrupt_handler 1       ; create handler for interrupt 1
 error_code_interrupt_handler 7        ; FIXED BOOK TYPO: Match macro name
+no_error_code_interrupt_handler 33
+no_error_code_interrupt_handler 32

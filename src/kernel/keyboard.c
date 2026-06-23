@@ -1,5 +1,6 @@
 #include "io.h"
 #include "keyboard.h"
+#include "serial.h"
 #define KBD_DATA_PORT 0x60
 
 /* KBDUS means US Keyboard Layout. This is a scancode table
@@ -69,6 +70,7 @@ void keyboard_handler(){
     if (ascii != 0) {
         // Use your serial_write or fb_write to print the character
         char str[2] = {ascii, '\0'}; // Create a string with the character and null terminator
-        serial_write(str);
+        serial_write_string(str);
+        
     }
 }

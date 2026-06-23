@@ -17,7 +17,7 @@ struct idt_entry {
     unsigned short base_high;
 } __attribute__((packed));
 
-void set_idt_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
+void set_idt_gate(int index, unsigned int base, unsigned short sel, unsigned char flags);
 
 void init_idt();
 

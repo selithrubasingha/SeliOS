@@ -78,6 +78,10 @@ void kmain() {
     
     printf(DEVICE_SERIAL, "SeliOS Serial Router is ONLINE!\n");
 
+    asm volatile("sti"); // STI stands for "Set Interrupt flag"
+
+    while (1){
+        
+    }
 }
 
-asm volatile("sti"); // STI stands for "Set Interrupt flag"
