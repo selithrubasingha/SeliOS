@@ -2,7 +2,7 @@
 #include "serial.h"
 #include "idt.h"
 #include "pic.h"
-
+#include "multiboot.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -79,6 +79,22 @@ void kmain(unsigned int ebx) {
     printf(DEVICE_SERIAL, "SeliOS Serial Router is ONLINE!\n");
 
     asm volatile("sti"); // STI stands for "Set Interrupt flag"
+
+    multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
+
+    // check if GRUB.QEMU actually loaded any modules
+    if (mbinfo->mods_count > 0) {
+        multiboot_module_t *modules = (multiboot_module_t *) mbinfo->mods_addr;
+
+        unsigned int address_of_module = modules->mod_start;
+
+        printf(DEVICE_FB, "Module loaded at address: 0x");
+
+        typedef void (*call_module_t)(void);
+        call_module_t start_program = (call_module_t) address_of_module;
+
+        start_program(); // Call the module's entry point
+    }
 
     while (1){
         
