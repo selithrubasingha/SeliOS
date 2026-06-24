@@ -17,7 +17,8 @@ align 4                         ; the code must be 4 byte aligned
 loader:                         ; the loader label (defined as entry point in linker script)
     ; Point the stack pointer (esp) to the TOP of the reserved stack space
     mov esp, kernel_stack + KERNEL_STACK_SIZE 
-    
+
+    push ebx      ; Push the Multiboot Info Pointer as an argument 
     ;Jump out of assembly and into your C code!
     call kmain
 .loop:

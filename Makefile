@@ -19,10 +19,13 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/pic.o \
           src/kernel/keyboard.o
 
-all: kernel.elf
+all: kernel.elf program.bin
 
 kernel.elf: $(OBJECTS)
 	$(LD) $(LDFLAGS) $(OBJECTS) -o kernel.elf
+
+program.bin: src/program.s
+	$(AS) -f bin $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -30,9 +33,8 @@ kernel.elf: $(OBJECTS)
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
-run: kernel.elf
-	# Added -serial stdio. This tells QEMU to pipe the COM1 port to your terminal!
-	qemu-system-x86_64 -kernel kernel.elf -serial stdio
+run: kernel.elf program.bin
+    qemu-system-x86_64 -kernel kernel.elf -initrd program.bin -serial stdio
 
 clean:
-	rm -f $(OBJECTS) kernel.elf
+	rm -f $(OBJECTS) kernel.elf program.bin

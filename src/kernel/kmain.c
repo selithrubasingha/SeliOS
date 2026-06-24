@@ -69,7 +69,7 @@ void printf(int device ,const char* str)
     }
 }
 
-void kmain() {
+void kmain(unsigned int ebx) {
     serial_init();
     init_idt(); // 1. Setup the emergency phonebook
     pic_init(); // 2. Remap the hardware secretary
