@@ -6,7 +6,6 @@ CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -T link.ld -melf_i386
 ASFLAGS = -f elf32
 
-# NEW: We added all the new .o files so GCC knows to compile them!
 OBJECTS = src/kernel/loader.o \
           src/kernel/kmain.o \
           src/kernel/io.o \
@@ -34,7 +33,7 @@ program.bin: src/program.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 run: kernel.elf program.bin
-    qemu-system-x86_64 -kernel kernel.elf -initrd program.bin -serial stdio
+	qemu-system-x86_64 -kernel kernel.elf -initrd program.bin -serial stdio
 
 clean:
 	rm -f $(OBJECTS) kernel.elf program.bin
