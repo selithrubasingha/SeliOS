@@ -19,7 +19,7 @@
 #define FB_DARK_GREY 8
 
 // Global framebuffer pointer (with volatile to prevent compiler optimization)
-volatile char *fb = (volatile char *) 0x000B8000;
+volatile char *fb = (volatile char *) (0x000B8000+ 0xC0000000);
 
 unsigned int cursor_pos = 0;
 
@@ -84,9 +84,9 @@ void kmain(unsigned int ebx) {
 
     // check if GRUB.QEMU actually loaded any modules
     if (mbinfo->mods_count > 0) {
-        multiboot_module_t *modules = (multiboot_module_t *) mbinfo->mods_addr;
+        multiboot_module_t *modules = (multiboot_module_t *) (mbinfo->mods_addr+ 0xC0000000);
 
-        unsigned int address_of_module = modules->mod_start;
+        unsigned int address_of_module = modules->mod_start+ 0xC0000000;
 
         printf(DEVICE_FB, "Module loaded at address: 0x");
 
