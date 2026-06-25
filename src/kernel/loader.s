@@ -47,6 +47,17 @@ higher_half:
     mov dword [page_directory], 0
     invlpg [0]
 
+    ; NOW it is safe to setup our stack, because the virtual addresses work!
+    mov esp, kernel_stack + KERNEL_STACK_SIZE 
+
+    ; The Multiboot pointer (in ecx) is a physical address. We must upgrade
+    ; it to a virtual address so our C code can read it!
+    add ecx, 0xC0000000
+    push ecx      ; Push the upgraded Multiboot pointer as an argument 
+    
+    ; Jump out of assembly and into your C code!
+    call kmain
+
      
 .loop:
     jmp .loop                   ; loop forever
