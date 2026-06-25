@@ -34,7 +34,15 @@ loader:                         ; the loader label (defined as entry point in li
 
     mov edx, cr0            
     or  edx, 0x80000000     ; Set PG (Paging Enabled!)
-    mov cr0, edx   
+    mov cr0, edx  
+
+    ; Teleport to the Higher Half! (Using eax instead of ebx to protect Multiboot)
+    lea eax, [higher_half]
+    jmp eax
+
+
+
+     
 .loop:
     jmp .loop                   ; loop forever
 
