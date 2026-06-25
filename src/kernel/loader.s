@@ -21,7 +21,20 @@ loader:                         ; the loader label (defined as entry point in li
     ; We subtract 0xC0000000 because paging isn't turned on yet!
     mov eax, page_directory - 0xC0000000    mov ecx, abx
 
+    ; Create the Maps (Using physical eax, not the virtual label)
+    mov dword [eax], 0x00000083             ; Identity Map (Virtual 0 -> Physical 0)
+    mov dword [eax + (768 * 4)], 0x00000083 ; Penthouse Map (Virtual 3GB -> Physical 0)
 
+    ; Turn on Paging! (From the book snippet)
+    mov cr3, eax            ; Give CPU the physical address of our directory
+
+    mov edx, cr4            
+    or  edx, 0x00000010     ; Set PSE (4MB Pages)
+    mov cr4, edx            
+
+    mov edx, cr0            
+    or  edx, 0x80000000     ; Set PG (Paging Enabled!)
+    mov cr0, edx   
 .loop:
     jmp .loop                   ; loop forever
 
