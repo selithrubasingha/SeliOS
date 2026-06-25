@@ -1,26 +1,29 @@
-ENTRY(loader)                /* the name of the entry label */
+ENTRY(loader)           /* the name of the entry symbol */
 
-SECTIONS {
-    . = 0x00100000;          /* the code should be loaded at 1 MB */
+. = 0xC0100000          /* the code should be relocated to 3GB + 1MB */
 
-    .text ALIGN (0x1000) :   /* align at 4 KB */
-    {
-        *(.text)             /* all text sections from all files */
-    }
-
-    .rodata ALIGN (0x1000) : /* read-only data */
-    {
-        *(.rodata*)          /* all read-only data sections from all files */
-    }
-
-    .data ALIGN (0x1000) :   /* data sections */
-    {
-        *(.data)             /* all data sections from all files */
-    }
-
-    .bss ALIGN (0x1000) :    /* bss sections */
-    {
-        *(COMMON)               /* all COMMON sections from all files */
-        *(.bss)              /* all bss sections from all files */
-    }
+/* align at 4 KB and load at 1 MB */
+.text ALIGN (0x1000) : AT(ADDR(.text)-0xC0000000)
+{
+    *(.text)            /* all text sections from all files */
 }
+
+/* align at 4 KB and load at 1 MB + . */
+.rodata ALIGN (0x1000) : AT(ADDR(.text)-0xC0000000)
+{
+    *(.rodata*)         /* all read-only data sections from all files */
+}
+
+/* align at 4 KB and load at 1 MB + . */
+.data ALIGN (0x1000) : AT(ADDR(.text)-0xC0000000)
+{
+    *(.data)            /* all data sections from all files */
+}
+
+/* align at 4 KB and load at 1 MB + . */
+.bss ALIGN (0x1000) : AT(ADDR(.text)-0xC0000000)
+{
+    *(COMMON)           /* all COMMON sections from all files */
+    *(.bss)             /* all bss sections from all files */
+}
+
