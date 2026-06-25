@@ -17,7 +17,15 @@ loader:                         ; the loader label (defined as entry point in li
     ; Point the stack pointer (esp) to the TOP of the reserved stack space
     mov esp, kernel_stack + KERNEL_STACK_SIZE 
 
-    push ebx      ; Push the Multiboot Info Pointer as an argument 
+    push ebx      ; Push the Multiboot Info Pointer as an argument
+
+    ; 1. Create the Identity Map (Virtual 0x0 -> Physical 0x0)
+    ; This goes into Slot 0 (offset 0 bytes)
+    mov dword [page_directory], 0x00000083
+
+    ; 2. Create the Higher-Half Map (Virtual 0xC0000000 -> Physical 0x0)
+    ; This goes into Slot 768 (offset 768 * 4 bytes)
+    mov dword [page_directory + (768 * 4)], 0x00000083 
     
     ;Jump out of assembly and into your C code!
     call kmain
