@@ -14,21 +14,14 @@ align 4                         ; the code must be 4 byte aligned
     dd CHECKSUM                 ; and the checksum
 
 loader:                         ; the loader label (defined as entry point in linker script)
-    ; Point the stack pointer (esp) to the TOP of the reserved stack space
-    mov esp, kernel_stack + KERNEL_STACK_SIZE 
+    ;Save the multiboot pointer (ebx) into ecx for safekeeping
+    mov ecx, ebx
 
-    push ebx      ; Push the Multiboot Info Pointer as an argument
+    ;Get the PHYSICAL address of the page directory
+    ; We subtract 0xC0000000 because paging isn't turned on yet!
+    mov eax, page_directory - 0xC0000000    mov ecx, abx
 
-    ; 1. Create the Identity Map (Virtual 0x0 -> Physical 0x0)
-    ; This goes into Slot 0 (offset 0 bytes)
-    mov dword [page_directory], 0x00000083
 
-    ; 2. Create the Higher-Half Map (Virtual 0xC0000000 -> Physical 0x0)
-    ; This goes into Slot 768 (offset 768 * 4 bytes)
-    mov dword [page_directory + (768 * 4)], 0x00000083 
-    
-    ;Jump out of assembly and into your C code!
-    call kmain
 .loop:
     jmp .loop                   ; loop forever
 
