@@ -40,7 +40,12 @@ loader:                         ; the loader label (defined as entry point in li
     lea eax, [higher_half]
     jmp eax
 
+higher_half:
+    ; We are now officially running at 3GB! The VR Headset is ON!
 
+    ; Step 5: Burn the Bridge (Unmap the Identity Map)
+    mov dword [page_directory], 0
+    invlpg [0]
 
      
 .loop:
