@@ -25,6 +25,10 @@ loader:                         ; the loader label (defined as entry point in li
     jmp .loop                   ; loop forever
 
 section .bss                    ; uninitialized data section
+align 4096
+page_directory:
+    resb 4096
+
 align 4                         ; align at 4 bytes for performance
 kernel_stack:                   ; label pointing to the bottom of memory
     resb KERNEL_STACK_SIZE      ; reserve 4096 bytes for the stack
