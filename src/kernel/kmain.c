@@ -3,6 +3,7 @@
 #include "idt.h"
 #include "pic.h"
 #include "multiboot.h"
+#include "gdt.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -70,6 +71,7 @@ void printf(int device ,const char* str)
 }
 
 void kmain(unsigned int ebx) {
+    init_gdt();
     serial_init();
     init_idt(); // 1. Setup the emergency phonebook
     pic_init(); // 2. Remap the hardware secretary
