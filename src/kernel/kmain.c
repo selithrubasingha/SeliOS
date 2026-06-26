@@ -70,6 +70,24 @@ void printf(int device ,const char* str)
     }
 }
 
+
+// NEW: A helper function to print integers as Hexadecimal strings!
+void print_hex(unsigned int num) {
+    char hex_str[11] = "0x00000000";
+    char hex_chars[] = "0123456789ABCDEF";
+    
+    for (int i = 7; i >= 0; i--) {
+        hex_str[i + 2] = hex_chars[num & 0x0F];
+        num >>= 4;
+    }
+    printf(DEVICE_FB, hex_str);
+}
+
+// THE C TRICK: Pretend the linker labels are empty functions
+extern void kernel_physical_start(void);
+extern void kernel_physical_end(void);
+
+
 void kmain(unsigned int ebx) {
     init_gdt();
     serial_init();
@@ -84,6 +102,28 @@ void kmain(unsigned int ebx) {
 
     multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
 
+
+    // --- PAGE FRAME ALLOCATOR PREP ---
+    
+    // 1. Calculate the Kernel boundaries using the C Trick!
+    unsigned int phys_start = (unsigned int) &kernel_physical_start;
+    unsigned int phys_end   = (unsigned int) &kernel_physical_end;
+    unsigned int kernel_size = phys_end - phys_start;
+
+    // 2. Read the total RAM from GRUB!
+    // GRUB gives us memory in Kilobytes. Multiply by 1024 to get raw Bytes!
+    unsigned int total_ram_bytes = (mbinfo->mem_lower + mbinfo->mem_upper) * 1024;
+
+    // Print out the intelligence we just gathered!
+    printf(DEVICE_FB, "Total RAM Available: ");
+    print_hex(total_ram_bytes);
+    printf(DEVICE_FB, " Bytes\n");
+
+    printf(DEVICE_FB, "Kernel Size: ");
+    print_hex(kernel_size);
+    printf(DEVICE_FB, " Bytes\n");
+    
+    
     // check if GRUB.QEMU actually loaded any modules
     if (mbinfo->mods_count > 0) {
         multiboot_module_t *modules = (multiboot_module_t *) (mbinfo->mods_addr+ 0xC0000000);
