@@ -74,27 +74,32 @@ void map_page(unsigned int virtual_address, unsigned int physical_address) {
     // Map the physical frame to the Page Table line
     first_page_table[pt_index] = (physical_address | 3);
 }
-
 void init_paging(unsigned int phys_start, unsigned int phys_end) {
-    // 1. Clear directory to prevent garbage data
+    // 1. Clear directory
     for(int i = 0; i < 1024; i++) page_directory[i] = 0;
 
-    // 2. Map the VGA buffer so printf works
-    map_page(0xC00B8000, 0x000B8000);
-    
-    // 3. Map every frame of the kernel
-    for (unsigned int addr = phys_start; addr < phys_end; addr += 4096) {
-        unsigned int virtual_address = addr + 0xC0000000;
-        map_page(virtual_address, addr);
+    // 2. IDENTITY MAP (0x00000000 to 0x00400000)
+    // This maps the first 4MB of RAM to the first 4MB of Virtual Memory.
+    // This allows the CPU to breathe safely during the switch.
+    for (unsigned int addr = 0; addr < 0x400000; addr += 4096) {
+        map_page(addr, addr); 
     }
 
-    // 4. Convert PD virtual address to physical address for the hardware
+    // 3. Map the VGA buffer (0xB8000 -> 0xC00B8000)
+    map_page(0xC00B8000, 0x000B8000);
+    
+    // 4. Map the kernel
+    for (unsigned int addr = phys_start; addr < phys_end; addr += 4096) {
+        map_page(addr + 0xC0000000, addr);
+    }
+
+    // 5. Convert PD virtual address to physical address
     unsigned int pd_phys = ((unsigned int)page_directory) - 0xC0000000;
 
-    // 5. Load physical address of PD into CR3
+    // 6. Load physical address of PD into CR3
     asm volatile("mov %0, %%cr3" : : "r"(pd_phys));
 
-    // 6. Flip the Paging bit in CR0
+    // 7. Turn on Paging
     unsigned int cr0;
     asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000; 
