@@ -1,5 +1,7 @@
 #include "memory.h"
 
+unsigned char bitmap[BITMAP_SIZE]; // The bitmap to track page frame allocation
+
 void set_bit(unsigned int index) {
     bitmap[index / 8] = bitmap[index / 8]|(1 << (index % 8));
 }

@@ -4,6 +4,7 @@
 #include "pic.h"
 #include "multiboot.h"
 #include "gdt.h"
+#include "memory.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -93,7 +94,6 @@ void kmain(unsigned int ebx) {
     serial_init();
     init_idt(); // 1. Setup the emergency phonebook
     pic_init(); // 2. Remap the hardware secretary
-    
     printf(DEVICE_FB, "SeliOS Screen Router is ONLINE!\n");
     
     printf(DEVICE_SERIAL, "SeliOS Serial Router is ONLINE!\n");
@@ -110,9 +110,14 @@ void kmain(unsigned int ebx) {
     unsigned int phys_end   = (unsigned int) &kernel_physical_end;
     unsigned int kernel_size = phys_end - phys_start;
 
+    
+
     // 2. Read the total RAM from GRUB!
     // GRUB gives us memory in Kilobytes. Multiply by 1024 to get raw Bytes!
     unsigned int total_ram_bytes = (mbinfo->mem_lower + mbinfo->mem_upper) * 1024;
+
+    // Setup the Physical Memory Manager!
+    init_memory(total_ram_bytes, phys_start, phys_end);
 
     // Print out the intelligence we just gathered!
     printf(DEVICE_FB, "Total RAM Available: ");

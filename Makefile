@@ -16,7 +16,8 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/interrupt_handler.o \
           src/kernel/interrupt.o \
           src/kernel/pic.o \
-          src/kernel/keyboard.o
+          src/kernel/keyboard.o \
+          src/kernel/memory.o
 
 all: kernel.elf program.bin
 
