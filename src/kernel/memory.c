@@ -25,6 +25,10 @@ unsigned int allocate_frame(){
     return 0; // Return 0 if no free frame is found
 }
 
+void free_frame(unsigned int frame_address){
+    unsigned int frame_index = frame_address / 4096;
+    clear_bit(frame_index);
+}
 
 void init_memory(unsigned int total_ram_bytes,unsigned int kernel_physical_start, unsigned int kernel_physical_end) {
     //  Pessimism. Loop through the whole bitmap and set EVERY bit to 1 (Used)

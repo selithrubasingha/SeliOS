@@ -122,6 +122,16 @@ void kmain(unsigned int ebx) {
     printf(DEVICE_FB, "Kernel Size: ");
     print_hex(kernel_size);
     printf(DEVICE_FB, " Bytes\n");
+
+    // Let's ask the manager for two rooms!
+    unsigned int frame1 = allocate_frame();
+    unsigned int frame2 = allocate_frame();
+
+    printf(DEVICE_FB, "First allocated frame: ");
+    print_hex(frame1);
+    printf(DEVICE_FB, "\nSecond allocated frame: ");
+    print_hex(frame2);
+    printf(DEVICE_FB, "\n");
     
     
     // check if GRUB.QEMU actually loaded any modules
