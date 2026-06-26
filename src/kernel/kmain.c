@@ -5,6 +5,7 @@
 #include "multiboot.h"
 #include "gdt.h"
 #include "memory.h"
+#include "paging.h"ggyG
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -85,11 +86,20 @@ void print_hex(unsigned int num) {
 }
 
 // THE C TRICK: Pretend the linker labels are empty functions
-extern void kernel_physical_start(void);
-extern void kernel_physical_end(void);
+//extern void kernel_physical_start(void);
+//extern void kernel_physical_end(void);
 
 
 void kmain(unsigned int ebx) {
+    // --- 1. INITIALIZE PAGING FIRST ---
+    // The kernel is running in higher-half. We switch to our custom Paging setup.
+    extern void kernel_physical_start(void);
+    extern void kernel_physical_end(void);
+    unsigned int phys_start = (unsigned int) &kernel_physical_start;
+    unsigned int phys_end   = (unsigned int) &kernel_physical_end;
+    init_paging(phys_start, phys_end);
+
+
     init_gdt();
     serial_init();
     init_idt(); // 1. Setup the emergency phonebook
@@ -106,8 +116,8 @@ void kmain(unsigned int ebx) {
     // --- PAGE FRAME ALLOCATOR PREP ---
     
     // 1. Calculate the Kernel boundaries using the C Trick!
-    unsigned int phys_start = (unsigned int) &kernel_physical_start;
-    unsigned int phys_end   = (unsigned int) &kernel_physical_end;
+    // unsigned int phys_start = (unsigned int) &kernel_physical_start;
+    // unsigned int phys_end   = (unsigned int) &kernel_physical_end;
     unsigned int kernel_size = phys_end - phys_start;
 
     
