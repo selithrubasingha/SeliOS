@@ -11,21 +11,35 @@ void clear_bit(unsigned int index) {
 int test_bit(unsigned int index) {
     return (bitmap[index / 8] & (1 << (index % 8))) != 0;
 }
-// 3. THE NEXT STEP: Setup the Hotel!
+
+unsigned int allocate_frame(){
+
+    for (unsigned int i = 0; i < BITMAP_SIZE*8 ;i++){
+        
+        if (!test_bit(i)){
+            set_bit(i);
+            return i*4096; // Return the physical address of the allocated frame
+        }
+
+    }
+    return 0; // Return 0 if no free frame is found
+}
+
+
 void init_memory(unsigned int total_ram_bytes,unsigned int kernel_physical_start, unsigned int kernel_physical_end) {
-    // Step A: Pessimism. Loop through the whole bitmap and set EVERY bit to 1 (Used)
+    //  Pessimism. Loop through the whole bitmap and set EVERY bit to 1 (Used)
     for (unsigned int i = 0; i < BITMAP_SIZE * 8; i++) {
         set_bit(i);
     }
     
-    // Step B: Loop through the available RAM (from GRUB) and set those bits to 0 (Free)
+    // Loop through the available RAM (from GRUB) and set those bits to 0 (Free)
     unsigned int total_frames = total_ram_bytes / 4096; // 4KB per frame
     for (unsigned int i = 0; i < total_frames; i++) {
         clear_bit(i);
     }
     
     
-    // Step C: Protect the VIP! Calculate which frames the Kernel is sitting in, 
+    // Protect the VIP! Calculate which frames the Kernel is sitting in, 
     // and set those specific bits back to 1 (Used)!
     unsigned int kernel_start_frame = kernel_physical_start / 4096;
     unsigned int kernel_end_frame = (kernel_physical_end + 4095) / 4096;
