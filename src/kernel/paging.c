@@ -1,4 +1,5 @@
-
+#include "paging.h"
+#include "memory.h"
 //page directory
 unsigned int page_directory[1024] __attribute__((aligned(4096))) ;
 
@@ -30,3 +31,30 @@ When you use the Bitwise OR operator (physical_address | 3), it perfectly pastes
 
 You are telling the CPU: "Here is the physical address, AND by the way, it is Present and Writeable!"
 */
+
+void init_paging(unsigned int kernel_physical_start, unsigned int kernel_physical_end) {
+    //mapping the VGA BUFFER page
+    map_page(0xC00B8000,0x000B8000);
+
+    //mapping the kernel
+    for (unsigned int addr = kernel_physical_start; addr < kernel_physical_end; addr += 4096) {
+        unsigned int virtual_address = addr + 0xC0000000; // Map to the higher half
+        map_page(virtual_address, addr);
+    }
+
+    // 3. Convert Page Directory virtual address to physical for the CPU hardware
+    unsigned int physical_pd_addr = ((unsigned int)page_directory) - 0xC0000000;
+    
+    // 4. Load the physical address into CR3
+    asm volatile("mov %0, %%cr3" : : "r"(physical_pd_addr));
+
+    // 5. Turn on Paging (Set the PG bit in CR0)
+    // We haven't done this part yet! The CPU won't actually use our 
+    // page directory until we flip this master switch.
+    unsigned int cr0;
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 |= 0x80000000; // Flip the PG (Paging) bit
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));// Load the page directory into the CR3 register
+    asm volatile("mov %0, %%cr3" : : "r"(page_directory));
+
+}
