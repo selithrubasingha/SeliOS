@@ -1,6 +1,9 @@
 #include "alloc.h"
+#include "memory.h"
+#include "paging.h"
 
 #define NULL ((void *)0)
+
 
 typedef long Align;    /* for alignment to long boundary */
 
@@ -14,14 +17,53 @@ union header {         /* block header: */
 
 typedef union header Header;
 
+// global static variable for heap virtual end
+static char *heap_end = (char *) 0xC0400000; // Start of the heap in virtual memory
+//starting virt address
+
+
 static Header base;              /* empty list to get started */
 static Header *freep = NULL;     /* start of free list */
+
+
+
+static Header *morecore(unsigned int nunits){
+    unsigned int nbytes = nunits * sizeof(Header);
+
+    int frames = (nbytes + 4095) / 4096; // Round up to the nearest page frame
+
+    char *heap_start = (char *) heap_end; // Start of the heap in virtual memory
+
+    for (int i = 0; i < frames; i++) {
+        unsigned int phys = allocate_frame();
+        if (phys == 0) {
+            return NULL; // No more free frames available
+        }
+
+        map_page((unsigned int)heap_end, phys);
+        heap_end += 4096; // Move the heap end to the next page frame
+
+
+    }
+
+
+    Header *start = (Header *)heap_start; //??
+    start->s.size = frames * (4096 / sizeof(Header)); // Total size in Header units
+
+    free((void *)(start + 1));
+
+    return freep; 
+
+
+
+
+}
 
 /* malloc: general-purpose storage allocator */
 void *malloc(unsigned nbytes)
 {
     Header *p, *prevp;
-    Header *morecore(unsigned);
+    Header *morecore(unsigned int);
     unsigned nunits;
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
@@ -69,3 +111,4 @@ void free(void *ap)
         p->s.ptr = bp;
     freep = p;
 }
+
