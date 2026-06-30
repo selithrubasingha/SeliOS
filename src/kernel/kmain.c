@@ -5,7 +5,8 @@
 #include "multiboot.h"
 #include "gdt.h"
 #include "memory.h"
-#include "paging.h"ggyG
+#include "paging.h"
+#include "alloc.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -130,25 +131,36 @@ void kmain(unsigned int ebx) {
     init_memory(total_ram_bytes, phys_start, phys_end);
 
     // Print out the intelligence we just gathered!
-    printf(DEVICE_FB, "Total RAM Available: ");
-    print_hex(total_ram_bytes);
-    printf(DEVICE_FB, " Bytes\n");
+    // printf(DEVICE_FB, "Total RAM Available: ");
+    // print_hex(total_ram_bytes);
+    // printf(DEVICE_FB, " Bytes\n");
 
-    printf(DEVICE_FB, "Kernel Size: ");
-    print_hex(kernel_size);
-    printf(DEVICE_FB, " Bytes\n");
+    // printf(DEVICE_FB, "Kernel Size: ");
+    // print_hex(kernel_size);
+    // printf(DEVICE_FB, " Bytes\n");
 
     // Let's ask the manager for two rooms!
     unsigned int frame1 = allocate_frame();
     unsigned int frame2 = allocate_frame();
 
-    printf(DEVICE_FB, "First allocated frame: ");
-    print_hex(frame1);
-    printf(DEVICE_FB, "\nSecond allocated frame: ");
-    print_hex(frame2);
-    printf(DEVICE_FB, "\n");
-    
-    
+    // printf(DEVICE_FB, "First allocated frame: ");
+    // print_hex(frame1);
+    // printf(DEVICE_FB, "\nSecond allocated frame: ");
+    // print_hex(frame2);
+    // printf(DEVICE_FB, "\n");
+        
+    printf(DEVICE_FB, "Testing Heap...\n");
+    int *test = (int *)malloc(sizeof(int));
+    if (test != NULL) {
+        *test = 0xDEADBEEF;
+        printf(DEVICE_FB, "Malloc success! Value: ");
+        print_hex(*test);
+        printf(DEVICE_FB, "\n");
+        free(test);
+        printf(DEVICE_FB, "Free success!\n");
+    } else {
+        printf(DEVICE_FB, "Malloc failed!\n");
+    }   
     // check if GRUB.QEMU actually loaded any modules
     if (mbinfo->mods_count > 0) {
         multiboot_module_t *modules = (multiboot_module_t *) (mbinfo->mods_addr+ 0xC0000000);

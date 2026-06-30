@@ -19,6 +19,7 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/keyboard.o \
           src/kernel/memory.o \
             src/kernel/paging.o \
+          src/kernel/alloc.o
 
 all: kernel.elf program.bin
 

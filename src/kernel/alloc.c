@@ -2,7 +2,6 @@
 #include "memory.h"
 #include "paging.h"
 
-#define NULL ((void *)0)
 
 
 typedef long Align;    /* for alignment to long boundary */
