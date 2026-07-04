@@ -1,64 +1,13 @@
 #include "paging.h"
 #include "memory.h"
+#define NULL ((void *)0)
+
 //page directory
 unsigned int page_directory[1024] __attribute__((aligned(4096))) ;
+unsigned int user_page_directory[1024] __attribute__((aligned(4096))) ;
 
 //page table
 unsigned int first_page_table[1024] __attribute__((aligned(4096))) ;
-
-// void map_page(unsigned int virtual_address, unsigned int physical_address){
-
-//     unsigned int page_directory_index = virtual_address >> 22; 
-//     unsigned int page_table_index = (virtual_address >> 12) & 0x03FF;
-
-//     // Set the page table entry
-//     first_page_table[page_table_index] = (physical_address |3);
-
-//     // Set the page directory entry
-//     // Corrected line in map_page:
-//     unsigned int physical_pt_addr = ((unsigned int)first_page_table) - 0xC0000000;
-//     page_directory[page_directory_index] = (physical_pt_addr | 3);    
-// }
-
-// /*
-// The Math Behind | 3
-// If we want to map a page so that it actually exists (Present = 1) and we can write to it (Read/Write = 2), we just add the values of those flags together!
-// 1 + 2 = 3.
-
-// In binary, the number 3 is 0000 0000 0000 0011.
-
-// When you use the Bitwise OR operator (physical_address | 3), it perfectly pastes those two 1s into the empty zeros at the very bottom of the physical address.
-
-// You are telling the CPU: "Here is the physical address, AND by the way, it is Present and Writeable!"
-// */
-
-// void init_paging(unsigned int kernel_physical_start, unsigned int kernel_physical_end) {
-//     //mapping the VGA BUFFER page
-//     map_page(0xC00B8000,0x000B8000);
-
-//     //mapping the kernel
-//     for (unsigned int addr = kernel_physical_start; addr < kernel_physical_end; addr += 4096) {
-//         unsigned int virtual_address = addr + 0xC0000000; // Map to the higher half
-//         map_page(virtual_address, addr);
-//     }
-
-//     // 3. Convert Page Directory virtual address to physical for the CPU hardware
-//     unsigned int physical_pd_addr = ((unsigned int)page_directory) - 0xC0000000;
-    
-//     // 4. Load the physical address into CR3
-//     asm volatile("mov %0, %%cr3" : : "r"(physical_pd_addr));
-
-//     // 5. Turn on Paging (Set the PG bit in CR0)
-//     // We haven't done this part yet! The CPU won't actually use our 
-//     // page directory until we flip this master switch.
-//     unsigned int cr0;
-//     asm volatile("mov %%cr0, %0" : "=r"(cr0));
-//     cr0 |= 0x80000000; // Flip the PG (Paging) bit
-//     asm volatile("mov %0, %%cr0" : : "r"(cr0));// Load the page directory into the CR3 register
-//     asm volatile("mov %0, %%cr3" : : "r"(page_directory));
-
-// }
-
 
 
 void map_page(unsigned int virtual_address, unsigned int physical_address) {
@@ -74,6 +23,7 @@ void map_page(unsigned int virtual_address, unsigned int physical_address) {
     // Map the physical frame to the Page Table line
     first_page_table[pt_index] = (physical_address | 3);
 }
+
 void init_paging(unsigned int phys_start, unsigned int phys_end) {
     // 1. Clear directory
     for(int i = 0; i < 1024; i++) page_directory[i] = 0;
@@ -104,4 +54,57 @@ void init_paging(unsigned int phys_start, unsigned int phys_end) {
     asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000; 
     asm volatile("mov %0, %%cr0" : : "r"(cr0));
+}
+
+
+unsigned int create_user_page_directory() {
+    /*
+    The C Code is Trapped: The moment you flipped that CR0 bit in your init_paging function, your C code was permanently 
+    trapped in the virtual matrix. A C pointer like 0xC0500000 is completely fake.
+
+The Bridge (Mapping Once): When you call map_page(0xC0500000, phys_dir_addr), you are configuring the CPU hardware. You are
+ telling it: "Hey, if my C code ever tries to read or write to this fake address, secretly redirect it to this real
+  physical frame."
+
+The Array Math: You only need to map it once because a physical frame is exactly 4096 bytes long. An unsigned int 
+in C is 4 bytes. 1024 * 4 = 4096. So, when your C code loops from dir_ptr[0] to dir_ptr[1023], the CPU perfectly 
+translates that into filling the entire 4KB physical frame, byte for byte, all routed through that single virtual
+ starting address!
+
+The Hardware Reality: The CPU's CR3 register is a physical piece of silicon. It doesn't understand the C code's 
+virtual illusion. That is exactly why the function must return the raw, unmapped physical address—so you can hand 
+it directly to the hardware later when it's time to run the user program.
+    */
+
+    
+    // 1. Get a raw physical frame for the new directory. 
+    // It is always 4KB, so no size parameter is needed.
+    unsigned int phys_dir_addr = allocate_frame();
+    if (phys_dir_addr == 0) {
+        return 0; // Out of memory!
+    }
+
+    // 2. We cannot write to 'phys_dir_addr' directly because paging is active.
+    // So, we temporarily map this single physical frame to a safe virtual address 
+    // (e.g., 0xC0500000) using your existing kernel map_page function.
+    unsigned int temp_virtual_addr = 0xC0500000;
+    map_page(temp_virtual_addr, phys_dir_addr);
+
+    // 3. Create a C pointer to that virtual address so we can safely edit the frame.
+    unsigned int *dir_ptr = (unsigned int *) temp_virtual_addr;
+
+    // 4. Zero out the entire directory so there is no garbage data.
+    for (int i = 0; i < 1024; i++) {
+        dir_ptr[i] = 0;
+    }
+
+    // 5. Copy the kernel's higher-half mappings (from index 768 to 1023).
+    // This perfectly clones the top 1GB of memory (Kernel, Heap, VGA).
+    for (int i = 768; i < 1024; i++) {
+        dir_ptr[i] = page_directory[i];
+    }
+       
+    // 6. Return the PHYSICAL address. The process struct needs this 
+    // so we can eventually load it into the CR3 register!
+    return phys_dir_addr;
 }
