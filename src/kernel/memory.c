@@ -60,3 +60,17 @@ void init_memory(unsigned int total_ram_bytes,unsigned int kernel_physical_start
         set_bit(i);
     }
 }
+
+void *memcpy(void *dest, const void *src, unsigned int n) {
+    // Cast the void pointers to char pointers so the compiler 
+    // knows we are moving exactly 1 byte at a time.
+    char *d = (char *)dest;
+    const char *s = (const char *)src;
+
+    // The dumb, reliable loop
+    for (unsigned int i = 0; i < n; i++) {
+        d[i] = s[i];
+    }
+
+    return dest;
+}
