@@ -43,7 +43,6 @@ process_t* create_process(unsigned int module_phys_addr, unsigned int module_siz
 
     unsigned int num_pages = (module_size + 4095) / 4096; // Calculate the number of pages needed for the module
 
-    unsigned int first_code_frame;
         
     for (unsigned int i = 0; i < num_pages; i++) {
         unsigned int frame = allocate_frame();
@@ -54,15 +53,15 @@ process_t* create_process(unsigned int module_phys_addr, unsigned int module_siz
         // Map directly into the user's empty sandbox starting at 0x00000000
         // We use map_page_user so the U/S bit is set to 1!
         unsigned int virtual_addr = 0x00000000 + (i * 4096);
-        map_page_user(virtual_addr, frame); 
+        map_user_page((unsigned int *)0xC0500000, virtual_addr, frame); 
     }
 
     // 5. memcpy the GRUB binary into the code frame
     unsigned int stack_frame = allocate_frame();
-    map_page_user(0xBFFFF000, stack_frame);
+    map_user_page((unsigned int *)0xC0500000, 0xBFFFF000, stack_frame);
 
     // 6. Return the finished process struct
-    memcpy((void *)0x00000000, (void *)module_phys_addr, module_size);
+    memcpy((void *)0x00000000, (void *)(module_phys_addr + 0xC0000000), module_size);
     return new_process;
 
 }
