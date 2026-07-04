@@ -24,6 +24,48 @@ void map_page(unsigned int virtual_address, unsigned int physical_address) {
     first_page_table[pt_index] = (physical_address | 3);
 }
 
+
+void map_user_page(unsigned int *target_directory, unsigned int virtual_address, unsigned int physical_address) {
+    unsigned int pd_index = virtual_address >> 22; 
+    unsigned int pt_index = (virtual_address >> 12) & 0x03FF;
+
+    // 1. Check if a Page Table already exists for this memory region
+    if (!(target_directory[pd_index] & 0x1)) {
+        // We need a new table! Allocate a raw physical frame for it.
+        unsigned int new_table_phys = allocate_frame();
+
+        // Temporarily map it to our workbench (0xC0600000) so C can touch it.
+        // We can use the kernel's normal map_page for the workbench.
+        map_page(0xC0600000, new_table_phys);
+        unsigned int *pt_ptr = (unsigned int *) 0xC0600000;
+
+        // Zero out the new table so there's no random garbage data
+        for (int i = 0; i < 1024; i++) {
+            pt_ptr[i] = 0;
+        }
+
+        // Link the new table into the user's directory. 
+        // | 7 means: Present (1) + Read/Write (2) + User Mode (4)
+        target_directory[pd_index] = (new_table_phys | 7);
+    }
+
+    // 2. We know the table exists now. We need its physical address 
+    // to map it to our workbench so we can write the final frame into it.
+    // (We use & 0xFFFFF000 to strip away the | 7 flags and get the raw address)
+    unsigned int table_phys = target_directory[pd_index] & 0xFFFFF000;
+
+    // Put the table on the workbench
+    map_page(0xC0600000, table_phys);
+    unsigned int *pt_ptr = (unsigned int *) 0xC0600000;
+
+    // 3. Write the actual physical memory frame into the table!
+    // Again, | 7 ensures the user program is legally allowed to access it.
+    pt_ptr[pt_index] = (physical_address | 7);
+}
+
+
+
+
 void init_paging(unsigned int phys_start, unsigned int phys_end) {
     // 1. Clear directory
     for(int i = 0; i < 1024; i++) page_directory[i] = 0;
