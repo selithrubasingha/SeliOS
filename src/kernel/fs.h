@@ -2,6 +2,9 @@
 struct fs_node;
 struct dirent;
 
+#define NULL ((void *)0)
+
+
 // Typedefs with _t to prevent naming collisions . (you know since it is a TYPE)
 // Notice we use 'struct fs_node*' and 'struct dirent*' here
 typedef unsigned int (*read_type_t)(struct fs_node*, unsigned int, unsigned int, char*);

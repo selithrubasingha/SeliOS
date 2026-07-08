@@ -1,5 +1,4 @@
 # include "fs.h"
-#define NULL ((void *)0)
 
 unsigned int read_fs(fs_node_t *node, unsigned int offset, unsigned int size, char *buffer) {
     // Now you can actually use 'node', 'offset', 'size', and 'buffer' in here!
