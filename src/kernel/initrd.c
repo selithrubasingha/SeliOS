@@ -131,3 +131,24 @@ struct dirent *initrd_readdir(fs_node_t *node, unsigned int index) {
     // 5. Return the pointer to our populated Post-it note
     return &dirent;
 }
+
+
+
+fs_node_t *initrd_finddir(fs_node_t *node, char *name) {
+    // 1. Loop through every single file in our RAM disk array
+    for (unsigned int i = 0; i < initrd_num_files; i++) {
+        
+        // 2. Compare the requested 'name' with the current file's name
+        // (You will need to implement strcmp in your string.c file for this!
+        // strcmp returns 0 if the two strings are perfectly identical.)
+        if (strcmp(name, initrd_file_nodes[i].name) == 0) {
+            
+            // 3. We found a match! Return a pointer directly to this specific node in the array.
+            return &initrd_file_nodes[i];
+        }
+    }
+
+    // 4. If the loop finishes and we never found a match, return NULL.
+    // This tells the VFS "File Not Found".
+    return NULL;
+}
