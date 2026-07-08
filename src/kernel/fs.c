@@ -31,3 +31,22 @@ void close_fs(fs_node_t *node) {
         node->close(node);
     }
 }
+
+
+
+// readdir and finddir
+dirent_t *readdir_fs(fs_node_t *node, unsigned int index) {
+    if (node->readdir) {
+        return node->readdir(node, index);
+    }       
+
+    return NULL; // Return NULL if the readdir function is not defined
+}
+
+fs_node_t *finddir_fs(fs_node_t *node, char *name) {
+    if (node->finddir) {
+        return node->finddir(node, name);
+    }
+
+    return NULL; // Return NULL if the finddir function is not defined
+}
