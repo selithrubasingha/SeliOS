@@ -105,3 +105,29 @@ unsigned int initrd_read(fs_node_t *node, unsigned int offset, unsigned int size
 
     return size; // Return the number of bytes read
 }
+
+// We need a single dirent_t struct to hold our answer. 
+// We make it 'static' so it doesn't get destroyed when the function ends, 
+// allowing us to safely return a pointer to it!
+static dirent_t dirent; 
+
+struct dirent *initrd_readdir(fs_node_t *node, unsigned int index) {
+    // 1. Safety Check: Did the OS ask for an index that is out of bounds?
+    // If we only have 5 files, and it asks for index 5 (the 6th file), we return NULL to stop the loop.
+    if (index >= initrd_num_files) {
+        return NULL; 
+    }
+
+    // 2. Grab the heavyweight file node from our global array
+    fs_node_t *target_file = &initrd_file_nodes[index];
+
+    // 3. Copy the name into our lightweight dirent struct
+    // (You will need to implement strcpy in your string.c file!)
+    strcpy(dirent.name, target_file->name);
+    
+    // 4. Copy the inode (the ID number)
+    dirent.inode = target_file->inode;
+
+    // 5. Return the pointer to our populated Post-it note
+    return &dirent;
+}
