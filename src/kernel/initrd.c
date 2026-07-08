@@ -2,6 +2,8 @@
 #include "fs.h"
 #include "string.h"
 
+unsigned int initrd_blob_start;
+
 // Assuming your allocator header is included here
 
 // We need these to stick around permanently in RAM so the VFS can access them later!
@@ -75,4 +77,31 @@ fs_node_t *initialize_initrd(unsigned int location) {
     // RETURN THE TRUNK
     // Hand this back to kmain so it can plug it into your VFS switchboard!
     return initrd_root;
+}
+
+
+unsigned int initrd_read(fs_node_t *node, unsigned int offset, unsigned int size, char *buffer){
+
+    //a BLOB is a binary large object , BLOB is the thing that actual data like file header and main header are stored .
+    
+    // 1. Jump to the raw QEMU blob, skip the main header, and grab this file's header using the inode index
+    file_header_t *blob_headers = (file_header_t *)(initrd_blob_start + sizeof(main_header_t));
+    file_header_t *file_header = &blob_headers[node->inode];
+    
+    // 2. Calculate the starting address of the file data in the raw blob memory
+    unsigned int file_data_start = initrd_blob_start + file_header->starting_offset;
+
+    // Ensure we don't read beyond the end of the file
+    if (offset > file_header->file_length) {
+        return 0; // Offset is beyond the end of the file
+    }
+    
+    if (offset + size > file_header->file_length) {
+        size = file_header->file_length - offset; // Adjust size to read only up to the end of the file
+    }
+
+    // Perform the actual read operation
+    memcpy(buffer, (char *)(file_data_start + offset), size);
+
+    return size; // Return the number of bytes read
 }
