@@ -75,20 +75,20 @@ int main() {
 
     // Prepare first file header
     strcpy(headers[0].file_name, "hello.txt");
-    headers[0].file_length = getFileSize("hello.txt");
+    headers[0].file_length = getFileSize("rootfs/hello.txt");
     headers[0].starting_offset = offset;
 
     // Prepare second file header
     strcpy(headers[1].file_name, "test.txt");
-    headers[1].file_length = getFileSize("test.txt");
+    headers[1].file_length = getFileSize("rootfs/test.txt");
     headers[1].starting_offset = offset + headers[0].file_length;
 
     // Write file headers to output file
     fwrite(headers, sizeof(file_header_t), numFiles, outputFile);
 
     // Dump the data for each file
-    dumpFileData("hello.txt", outputFile);
-    dumpFileData("test.txt", outputFile);
+    dumpFileData("rootfs/hello.txt", outputFile);
+    dumpFileData("rootfs/test.txt", outputFile);
 
     // Close the output file
     fclose(outputFile);
