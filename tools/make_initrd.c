@@ -95,3 +95,11 @@ int main() {
     
     return EXIT_SUCCESS;
 }
+
+
+// WHAT THE HELL IS AN IMG FILE ??? 
+/*
+We chose to name our file initrd.img (Initial RAM Disk Image) purely as a naming convention. The .img extension tells other
+ developers, "Hey, this file contains a bit-for-bit copy of a file system." But you could have named it initrd.seli or initrd
+ .potato and your C packer tool, QEMU, and your OS would have treated it exactly the same way. It is just a raw sequence of bytes.
+*/

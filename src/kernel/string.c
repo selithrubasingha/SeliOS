@@ -29,4 +29,22 @@ int strcmp(const char *s1, const char *s2) {
     
     // Cast to unsigned char to handle extended ASCII characters safely
     return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+
+
+}
+
+// Copies the entire string 'src' to 'dest', including the null terminator.
+char *strcpy(char *dest, const char *src) {
+    unsigned int i = 0;
+    
+    // Copy character by character until we hit the end of the source string
+    while (src[i] != '\0') {
+        dest[i] = src[i];
+        i++;
+    }
+    
+    // Don't forget to cap off the destination string with a null terminator!
+    dest[i] = '\0';
+    
+    return dest;
 }

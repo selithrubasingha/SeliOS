@@ -7,6 +7,9 @@
 #include "memory.h"
 #include "paging.h"
 #include "alloc.h"
+#include "initrd.h"
+#include "string.h"
+#include "fs.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -54,18 +57,27 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
     fb[i] = c;
     fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
 }
+
 void putchar(int device, char c) {
     if (device == DEVICE_SERIAL) {
         serial_write_char(c);
     } 
     else if (device == DEVICE_FB) {
-        fb_write_cell(cursor_pos * 2, c, FB_GREEN, FB_DARK_GREY);
-        
-        cursor_pos++;
+        // Did we receive a newline character?
+        if (c == '\n') {
+            // Move cursor to the start of the next row (Next multiple of 80)
+            cursor_pos = (cursor_pos / 80 + 1) * 80;
+        } else {
+            // It's a normal character, print it!
+            fb_write_cell(cursor_pos * 2, c, FB_GREEN, FB_DARK_GREY);
+            cursor_pos++;
+        }
         
         fb_move_cursor(cursor_pos);
     }
 }
+
+
 void printf(int device ,const char* str)
 {
     for (unsigned int i = 0; str[i] != '\0'; i++){
@@ -161,20 +173,40 @@ void kmain(unsigned int ebx) {
     } else {
         printf(DEVICE_FB, "Malloc failed!\n");
     }   
-    // check if GRUB.QEMU actually loaded any modules
+    
+    // check if GRUB/QEMU actually loaded any modules (Our initrd.img!)
     if (mbinfo->mods_count > 0) {
-        multiboot_module_t *modules = (multiboot_module_t *) (mbinfo->mods_addr+ 0xC0000000);
+        // Find the module array provided by GRUB
+        multiboot_module_t *modules = (multiboot_module_t *) (mbinfo->mods_addr + 0xC0000000);
 
-        unsigned int address_of_module = modules->mod_start+ 0xC0000000;
+        // 1. Find the virtual memory address where GRUB dropped your blob
+        unsigned int initrd_location = modules->mod_start + 0xC0000000;
+        printf(DEVICE_FB, "Initrd loaded at memory address...\n");
 
-        printf(DEVICE_FB, "Module loaded at address: 0x");
+        // 2. Initialize the RAM Disk driver you wrote!
+        fs_node_t *fs_root = initialize_initrd(initrd_location);
 
-        typedef void (*call_module_t)(void);
-        call_module_t start_program = (call_module_t) address_of_module;
+        // 3. Search for the file using the VFS switchboard
+        fs_node_t *hello_node = finddir_fs(fs_root, "hello.txt");
 
-        start_program(); // Call the module's entry point
+        if (hello_node != NULL) {
+            char buffer[256];
+            
+            // 4. Read the file using the VFS switchboard
+            unsigned int bytes_read = read_fs(hello_node, 0, 255, buffer);
+            buffer[bytes_read] = '\0'; // Null-terminate the string safely
+            
+            // 5. Print it to the screen! 
+            printf(DEVICE_FB, "Read from file: ");
+            printf(DEVICE_FB, buffer);
+            printf(DEVICE_FB, "\n");
+        } else {
+            printf(DEVICE_FB, "ERROR: hello.txt not found!\n");
+        }
+    } else {
+        printf(DEVICE_FB, "ERROR: No GRUB modules loaded!\n");
     }
-
+    
     while (1){
         
     }

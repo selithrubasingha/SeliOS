@@ -20,6 +20,7 @@ fs_node_t *initrd_finddir(fs_node_t *node, char *name);
 
 fs_node_t *initialize_initrd(unsigned int location) {
 
+    initrd_blob_start = location; // <--- THIS IS CRITICAL
     // Read the Main Header
     main_header_t *header = (main_header_t *)location;
     initrd_num_files = header->num_of_files;

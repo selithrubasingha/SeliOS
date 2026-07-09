@@ -19,7 +19,10 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/keyboard.o \
           src/kernel/memory.o \
             src/kernel/paging.o \
-          src/kernel/alloc.o
+          src/kernel/alloc.o \
+          src/kernel/initrd.o \
+          src/kernel/string.o \
+          src/kernel/fs.o
 
 all: kernel.elf program.bin
 
@@ -44,8 +47,8 @@ program.bin: src/start.s src/program.c
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
-run: kernel.elf program.bin
-	qemu-system-x86_64 -kernel kernel.elf -initrd program.bin -serial stdio
+run: kernel.elf initrd.img
+	qemu-system-x86_64 -kernel kernel.elf -initrd initrd.img -serial stdio
 
 clean:
 	rm -f $(OBJECTS) kernel.elf program.bin
