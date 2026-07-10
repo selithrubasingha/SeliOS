@@ -22,7 +22,8 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/alloc.o \
           src/kernel/initrd.o \
           src/kernel/string.o \
-          src/kernel/fs.o
+          src/kernel/fs.o \
+          src/kernel/user_mode.o \
 
 all: kernel.elf program.bin
 

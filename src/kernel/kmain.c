@@ -206,6 +206,16 @@ void kmain(unsigned int ebx) {
     } else {
         printf(DEVICE_FB, "ERROR: No GRUB modules loaded!\n");
     }
+
+
+    printf(DEVICE_FB, "\n--- FIRING SYSTEM CALL FROM KERNEL MODE ---\n");
+    
+    // This inline assembly forces the number '1' into the EAX register
+    // and then manually fires the 128 (0x80) interrupt.
+    asm volatile("int $0x80" : : "a"(1));
+
+    printf(DEVICE_FB, "If you see a hello message above me, the router works!\n");
+    
     
     while (1){
         
