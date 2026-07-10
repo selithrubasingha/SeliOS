@@ -5,6 +5,7 @@
 extern void load_idt(unsigned int idt_address);
 extern void interrupt_handler_33();
 extern void interrupt_handler_32();
+extern void interrupt_handler_128();
 
 struct idt_entry idt_entries[256]; // Our 256 rules
 struct idt idt_ptr;                // The book's pointer struct
@@ -27,6 +28,7 @@ void init_idt() {
     // 0x08 is the Kernel Code Segment. 0x8E means "Present, Ring 0".
     set_idt_gate(32, (unsigned int)interrupt_handler_32, 0x08, 0x8E);
     set_idt_gate(33, (unsigned int)interrupt_handler_33, 0x08, 0x8E);
+    set_idt_gate(128, (unsigned int)interrupt_handler_128, 0x08, 0xEE);
 
     // 2. Trigger the assembly code!
     load_idt((unsigned int)&idt_ptr);
