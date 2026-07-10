@@ -30,3 +30,8 @@ typedef struct {
     unsigned short trap;     // Unused
     unsigned short iomap_base; // Unused
 } __attribute__((packed)) tss_entry_t;
+
+
+
+// This tells the compiler to actually allocate the 104 bytes of RAM!
+tss_entry_t tss_entry;
