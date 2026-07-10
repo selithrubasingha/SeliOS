@@ -53,5 +53,8 @@ void init_gdt() {
 
     // 3. Trigger the assembly code!
     load_gdt((unsigned int)&gdt_ptr);
+
+    //ltr function use to store 0x28
+    asm volatile("ltr %%ax" : : "a"(0x28));
 }
 
