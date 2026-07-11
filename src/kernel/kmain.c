@@ -11,6 +11,7 @@
 #include "string.h"
 #include "fs.h"
 #include "thread.h"
+#include "timer.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -240,15 +241,20 @@ void kmain(unsigned int ebx) {
     asm volatile("int $0x80" : : "a"(1));
 
     printf(DEVICE_FB, "If you see a hello message above me, the router works!\n");
-   
+    
+    printf(DEVICE_FB, "\n--- PREEMPTIVE SCHEDULING ---\n");
     init_threads();
     
     // Now you can use them exactly like before!
     create_user_thread(task_a);
     create_user_thread(task_b);
 
+
+    init_timer(100); // Initialize the timer with a frequency of 100 Hz
+
     while (1) {
-        asm volatile("int $0x80" : : "a"(3));
+        asm volatile("sti"); // Just make sure interrupts are on!
+        asm volatile("hlt"); // Put the CPU to sleep until the next timer tick
     }   
 
 

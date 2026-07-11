@@ -26,7 +26,8 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/user_mode.o \
           src/kernel/thread.o \
           src/kernel/switch_task.o \
-          src/program.o
+          src/program.o \
+          src/kernel/timer.o
 
 all: kernel.elf 
 
