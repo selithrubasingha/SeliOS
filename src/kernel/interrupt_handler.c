@@ -3,6 +3,9 @@
 #include "pic.h"
 #include "thread.h"
 
+
+#define DEVICE_FB     0
+
 void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_state stack) {
     // The CPU is paused. Decide what to do based on 'intr_no'
 
@@ -13,7 +16,7 @@ void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_
             case 1:
                 // They want to print! 
                 // (Hint: The string pointer they want to print is probably sitting in regs->ebx)
-                printf(0,"User program says hello!\n");
+                printf(DEVICE_FB, (char *)cpu.ebx);
                 break;
             case 2:
                 // They want to read a file!
