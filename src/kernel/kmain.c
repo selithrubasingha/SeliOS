@@ -65,6 +65,25 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
 }
 
 void putchar(int device, char c) {
+
+    // If we hit the bottom of the screen (80 cols * 25 rows = 2000)
+    if (cursor_pos >= 2000) {
+        // 1. Move all rows up by one (shift everything back by 80 characters)
+        // (You can write a simple loop or use memcpy if you have it)
+        for (int i = 0; i < 24 * 80; i++) {
+            fb[i * 2] = fb[(i + 80) * 2];         // Copy character
+            fb[i * 2 + 1] = fb[(i + 80) * 2 + 1]; // Copy color
+        }
+        
+        // 2. Clear out the very last row with blank spaces
+        for (int i = 24 * 80; i < 25 * 80; i++) {
+            fb_write_cell(i * 2, ' ', FB_GREEN, FB_DARK_GREY);
+        }
+        
+        // 3. Reset the cursor to the start of the final row!
+        cursor_pos = 24 * 80; 
+    }
+    
     if (device == DEVICE_SERIAL) {
         serial_write_char(c);
     } 

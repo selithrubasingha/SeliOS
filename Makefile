@@ -24,8 +24,11 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/string.o \
           src/kernel/fs.o \
           src/kernel/user_mode.o \
+          src/kernel/thread.o \
+          src/kernel/switch_task.o \
+          src/program.o
 
-all: kernel.elf program.bin
+all: kernel.elf 
 
 kernel.elf: $(OBJECTS)
 	$(LD) $(LDFLAGS) $(OBJECTS) -o kernel.elf
@@ -34,13 +37,6 @@ kernel.elf: $(OBJECTS)
 USER_CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -O2 -Wall -Wextra
 USER_LDFLAGS = -T user.ld -melf_i386
 
-program.bin: src/start.s src/program.c
-	# 1. Compile the assembly front-door to an object file
-	$(AS) $(ASFLAGS) src/start.s -o start.o
-	# 2. Compile the user's C program
-	$(CC) $(USER_CFLAGS) -c src/program.c -o program.o
-	# 3. Link them together into a flat binary using your new linker script
-	$(LD) $(USER_LDFLAGS) start.o program.o -o program.bin
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -48,8 +44,8 @@ program.bin: src/start.s src/program.c
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
-run: kernel.elf initrd.img
+run: kernel.elf
 	qemu-system-x86_64 -kernel kernel.elf -initrd initrd.img -serial stdio
 
 clean:
-	rm -f $(OBJECTS) kernel.elf program.bin
+	rm -f $(OBJECTS) kernel.elf 
