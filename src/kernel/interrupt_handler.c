@@ -1,6 +1,7 @@
 #include "interrupt_handler.h"
 #include "keyboard.h"
 #include "pic.h"
+#include "thread.h"
 
 void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_state stack) {
     // The CPU is paused. Decide what to do based on 'intr_no'
@@ -16,6 +17,10 @@ void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_
                 break;
             case 2:
                 // They want to read a file!
+                break;
+            case 3:
+                // They want to yield the CPU to another thread!
+                thread_yield();
                 break;
             default:
                 printf(0,"Unknown system call!\n");

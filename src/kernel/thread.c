@@ -3,6 +3,10 @@
 #define NULL ((void *)0)
 // global variable current task index
 
+
+// Make sure C knows about your assembly function!
+extern void switch_task(unsigned int *old_esp_ptr, unsigned int new_esp);
+
 thread_t *current_thread = NULL;
 
 thread_t main_thread ;
@@ -39,6 +43,20 @@ void create_thread(void (*thread_function)()){
     new_thread->esp = (unsigned int)stack_top; // Set the new thread's stack pointer
     new_thread->next_thread = current_thread->next_thread; // Link the new thread into the circular list
     current_thread->next_thread = new_thread; // Update the current thread's next pointer to point to the new thread
+
+
+
+
+
+}
+
+void thread_yield() {
+    
+    thread_t *old_thread = current_thread;
+    current_thread = current_thread->next_thread; // Move to the next thread in the circular list
+
+    //call switch task assembly function
+    switch_task(&old_thread->esp, current_thread->esp); // Switch to the next thread
 
 
 
