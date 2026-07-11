@@ -1,10 +1,16 @@
 
-int main(){
-    //we are in Ring3, we can use the stack and heap now
-
+void task_a() {
+    char *msg = "A"; 
     while (1) {
-        // Do something
+        asm volatile("int $0x80" : : "a"(1), "b"(msg)); 
+        asm volatile("int $0x80" : : "a"(3)); 
     }
+}
 
-    return 0;
+void task_b() {
+    char *msg = "B"; 
+    while (1) {
+        asm volatile("int $0x80" : : "a"(1), "b"(msg)); 
+        asm volatile("int $0x80" : : "a"(3)); 
+    }
 }

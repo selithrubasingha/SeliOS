@@ -10,6 +10,7 @@
 #include "initrd.h"
 #include "string.h"
 #include "fs.h"
+#include "thread.h"
 #define DEVICE_FB     0
 #define DEVICE_SERIAL 1
 
@@ -24,6 +25,11 @@
 // Colors from the example
 #define FB_GREEN     2
 #define FB_DARK_GREY 8
+
+// Tell kmain to look for these symbols in another file
+extern void task_a();
+extern void task_b();
+
 
 // Global framebuffer pointer (with volatile to prevent compiler optimization)
 volatile char *fb = (volatile char *) (0x000B8000+ 0xC0000000);
@@ -215,10 +221,18 @@ void kmain(unsigned int ebx) {
     asm volatile("int $0x80" : : "a"(1));
 
     printf(DEVICE_FB, "If you see a hello message above me, the router works!\n");
+   
+    init_threads();
     
-    
-    while (1){
-        
-    }
+    // Now you can use them exactly like before!
+    create_user_thread(task_a);
+    create_user_thread(task_b);
+
+    while (1) {
+        asm volatile("int $0x80" : : "a"(3));
+    }   
+
+
+
 }
 
