@@ -41,7 +41,10 @@ void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_
     else if (intr_no >= 32 && intr_no <= 47) {
         pic_acknowledge(intr_no);
         // It's a hardware interrupt, but not the keyboard.
-        // For now, we can just ignore it.
+        if (intr_no == 32) {
+            // It's the timer interrupt! Call the scheduler to switch threads.
+            thread_yield();
+        }
     }
     else {
         // Some other random CPU exception happened.
