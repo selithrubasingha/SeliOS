@@ -143,7 +143,7 @@ void kmain(unsigned int ebx) {
     serial_init();
     init_idt(); // 1. Setup the emergency phonebook
     pic_init(); // 2. Remap the hardware secretary
-    printf(DEVICE_FB, "SeliOS Screen Router is ONLINE!\n");
+    // printf(DEVICE_FB, "SeliOS Screen Router is ONLINE!\n");
     
     printf(DEVICE_SERIAL, "SeliOS Serial Router is ONLINE!\n");
 
@@ -187,18 +187,24 @@ void kmain(unsigned int ebx) {
     // print_hex(frame2);
     // printf(DEVICE_FB, "\n");
         
-    printf(DEVICE_FB, "Testing Heap...\n");
-    int *test = (int *)malloc(sizeof(int));
-    if (test != NULL) {
-        *test = 0xDEADBEEF;
-        printf(DEVICE_FB, "Malloc success! Value: ");
-        print_hex(*test);
-        printf(DEVICE_FB, "\n");
-        free(test);
-        printf(DEVICE_FB, "Free success!\n");
-    } else {
-        printf(DEVICE_FB, "Malloc failed!\n");
-    }   
+    // printf(DEVICE_FB, "Testing Heap...\n");
+    // int *test = (int *)malloc(sizeof(int));
+    // if (test != NULL) {
+    //     *test = 0xDEADBEEF;
+    //     printf(DEVICE_FB, "Malloc success! Value: ");
+    //     print_hex(*test);
+    //     printf(DEVICE_FB, "\n");
+    //     free(test);
+    //     printf(DEVICE_FB, "Free success!\n");
+    // } else {
+    //     printf(DEVICE_FB, "Malloc failed!\n");
+    // }   
+
+    printf(DEVICE_FB, "  ____       _ _  ___  ____  \n");
+    printf(DEVICE_FB, " / ___|  ___| (_)/ _ \\/ ___| \n"); // Notice the double \\ here!
+    printf(DEVICE_FB, " \\___ \\ / _ \\ | | | | \\___ \\ \n"); // And here!
+    printf(DEVICE_FB, "  ___) |  __/ | | |_| |___) |\n");
+    printf(DEVICE_FB, " |____/ \\___|_|_|\\___/|____/ \n");
     
     // check if GRUB/QEMU actually loaded any modules (Our initrd.img!)
     if (mbinfo->mods_count > 0) {
@@ -223,9 +229,9 @@ void kmain(unsigned int ebx) {
             buffer[bytes_read] = '\0'; // Null-terminate the string safely
             
             // 5. Print it to the screen! 
-            printf(DEVICE_FB, "Read from file: ");
-            printf(DEVICE_FB, buffer);
-            printf(DEVICE_FB, "\n");
+            // printf(DEVICE_FB, "Read from file: ");
+            // printf(DEVICE_FB, buffer);
+            // printf(DEVICE_FB, "\n");
         } else {
             printf(DEVICE_FB, "ERROR: hello.txt not found!\n");
         }
@@ -238,23 +244,23 @@ void kmain(unsigned int ebx) {
     
     // This inline assembly forces the number '1' into the EAX register
     // and then manually fires the 128 (0x80) interrupt.
-    asm volatile("int $0x80" : : "a"(1));
+    //asm volatile("int $0x80" : : "a"(1));
 
-    printf(DEVICE_FB, "If you see a hello message above me, the router works!\n");
+    //printf(DEVICE_FB, "If you see a hello message above me, the router works!\n");
     
-    printf(DEVICE_FB, "\n--- PREEMPTIVE SCHEDULING ---\n");
-    init_threads();
+    // printf(DEVICE_FB, "\n--- PREEMPTIVE SCHEDULING ---\n");
+    // init_threads();
     
-    // Now you can use them exactly like before!
-    create_user_thread(task_a);
-    create_user_thread(task_b);
+    // // Now you can use them exactly like before!
+    // create_user_thread(task_a);
+    // create_user_thread(task_b);
 
 
     init_timer(100); // Initialize the timer with a frequency of 100 Hz
 
     while (1) {
-        asm volatile("sti"); // Just make sure interrupts are on!
-        asm volatile("hlt"); // Put the CPU to sleep until the next timer tick
+        // asm volatile("sti"); // Just make sure interrupts are on!
+        // asm volatile("hlt"); // Put the CPU to sleep until the next timer tick
     }   
 
 
