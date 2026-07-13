@@ -43,7 +43,7 @@ void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_
         // It's a hardware interrupt, but not the keyboard.
         if (intr_no == 32) {
             // It's the timer interrupt! Call the scheduler to switch threads.
-            thread_yield();
+            //thread_yield();
         }
     }
     else {

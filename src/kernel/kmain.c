@@ -128,6 +128,38 @@ void print_hex(unsigned int num) {
 //extern void kernel_physical_start(void);
 //extern void kernel_physical_end(void);
 
+void clear_screen() {
+    // Fill all 2000 VGA character slots with blank spaces
+    for (int i = 0; i < 2000; i++) {
+        fb_write_cell(i * 2, ' ', FB_GREEN, FB_DARK_GREY);
+    }
+    // Reset the global cursor back to the top left (0,0)
+    cursor_pos = 0;
+    fb_move_cursor(cursor_pos);
+}
+
+void print_lock_screen() {
+    // Drop down a few lines for vertical centering
+    printf(DEVICE_FB, "\n\n\n\n\n");
+    
+    // The fully translated, pre-padded CP437 ASCII Art!
+    printf(DEVICE_FB, "                \xDF\xDF\xDF\xDB\xDB\xDC         \xB0\xB0\xB0              \xDF\xDF\xDF\xDB\xDB\xDC  \xDF\xDF\xDF\xDB\xDB\xDC\n");
+    printf(DEVICE_FB, "               \xB0\xB0\xB0 \xDB\xDB\xDB         \xB1\xB1\xB1       \xDC\xDC\xDC   \xB0\xB0\xB0 \xDB\xDB\xDB \xB0\xB0\xB0 \xDB\xDB\xDB\n");
+    printf(DEVICE_FB, "               \xB1\xB1\xB1             \xB2\xB2\xB2       \xDF\xDF\xDF   \xB1\xB1\xB1 \xDB\xDB\xDB \xB1\xB1\xB1    \n");
+    printf(DEVICE_FB, "               \xDF\xB2\xB2\xDC\xDC\xDC  \xDC\xDB\xDB\xDF\xDB\xDB\xDC \xDB\xDB\xDB      \xDF\xDB\xDB\xDB   \xB2\xB2\xB2 \xDB\xDB\xDB \xDF\xB2\xB2\xDC\xDC\xDC \n");
+    printf(DEVICE_FB, "                   \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB       \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB     \xDB\xDB\xDB\n");
+    printf(DEVICE_FB, "                   \xDB\xDB\xDB \xDB\xDB\xDB\xDF\xDF\xDF\xDF \xDB\xDB\xDB       \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB     \xDB\xDB\xDB\n");
+    printf(DEVICE_FB, "               \xDC\xDC\xDC \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDC\xDC\xDC   \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB \xDC\xDC\xDC \xDB\xDB\xDB\n");
+    printf(DEVICE_FB, "               \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB   \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB\n");
+    printf(DEVICE_FB, "               \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDC\xDC\xDB\xDB\xDB\xDC\xDC \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF\n");
+    printf(DEVICE_FB, "                         \xDB\xDF      \xDF\xDB                           \n");
+    printf(DEVICE_FB, "                         \xDC       \xDC                            \n");
+    
+    // Spacing for the prompt at the bottom
+    printf(DEVICE_FB, "\n\n\n\n");
+    printf(DEVICE_FB, "                                        [ Press ENTER to access terminal ]      \n");
+}
+
 
 void kmain(unsigned int ebx) {
     // --- 1. INITIALIZE PAGING FIRST ---
@@ -200,12 +232,18 @@ void kmain(unsigned int ebx) {
     //     printf(DEVICE_FB, "Malloc failed!\n");
     // }   
 
-    printf(DEVICE_FB, "  ____       _ _  ___  ____  \n");
-    printf(DEVICE_FB, " / ___|  ___| (_)/ _ \\/ ___| \n"); // Notice the double \\ here!
-    printf(DEVICE_FB, " \\___ \\ / _ \\ | | | | \\___ \\ \n"); // And here!
-    printf(DEVICE_FB, "  ___) |  __/ | | |_| |___) |\n");
-    printf(DEVICE_FB, " |____/ \\___|_|_|\\___/|____/ \n");
+    // Wipe all the debug logs
+    clear_screen();
     
+    // Print the masterpiece
+    print_lock_screen();
+
+    // Hang the CPU forever so you can admire it
+    while(1) {
+        asm volatile("hlt");
+    }
+   
+
     // check if GRUB/QEMU actually loaded any modules (Our initrd.img!)
     if (mbinfo->mods_count > 0) {
         // Find the module array provided by GRUB
@@ -256,7 +294,7 @@ void kmain(unsigned int ebx) {
     // create_user_thread(task_b);
 
 
-    init_timer(100); // Initialize the timer with a frequency of 100 Hz
+    // init_timer(100); // Initialize the timer with a frequency of 100 Hz
 
     while (1) {
         // asm volatile("sti"); // Just make sure interrupts are on!
