@@ -31,8 +31,8 @@
 #define VGA_WHITE          15
 
 /* Default SeliOS Theme */
-#define DEFAULT_FG         VGA_GREEN
-#define DEFAULT_BG         VGA_DARK_GREY
+#define DEFAULT_FG         VGA_WHITE
+#define DEFAULT_BG         VGA_BLUE
 
 extern unsigned int cursor_pos;
 

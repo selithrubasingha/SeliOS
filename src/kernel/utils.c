@@ -112,24 +112,25 @@ void clear_screen() {
     cursor_pos = 0;
     fb_move_cursor(cursor_pos);
 }
-
 void print_lock_screen() {
-    printf_color(DEVICE_FB, "\n\n\n\n\n", VGA_LIGHT_GREY, VGA_BLACK);
+    printf_color(DEVICE_FB, "\n\n\n\n\n", DEFAULT_FG, DEFAULT_BG);
     
-    // Explicitly rendering the title with dedicated high-contrast coloring
-    printf_color(DEVICE_FB, "                \xDF\xDF\xDF\xDB\xDB\xDC         \xB0\xB0\xB0              \xDF\xDF\xDF\xDB\xDB\xDC  \xDF\xDF\xDF\xDB\xDB\xDC\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "               \xB0\xB0\xB0 \xDB\xDB\xDB         \xB1\xB1\xB1       \xDC\xDC\xDC   \xB0\xB0\xB0 \xDB\xDB\xDB \xB0\xB0\xB0 \xDB\xDB\xDB\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "               \xB1\xB1\xB1             \xB2\xB2\xB2       \xDF\xDF\xDF   \xB1\xB1\xB1 \xDB\xDB\xDB \xB1\xB1\xB1    \n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "               \xDF\xB2\xB2\xDC\xDC\xDC  \xDC\xDB\xDB\xDF\xDB\xDB\xDC \xDB\xDB\xDB      \xDF\xDB\xDB\xDB   \xB2\xB2\xB2 \xDB\xDB\xDB \xDF\xB2\xB2\xDC\xDC\xDC \n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "                   \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB       \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB     \xDB\xDB\xDB\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "                   \xDB\xDB\xDB \xDB\xDB\xDB\xDF\xDF\xDF\xDF \xDB\xDB\xDB       \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB     \xDB\xDB\xDB\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "               \xDC\xDC\xDC \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDC\xDC\xDC   \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB \xDC\xDC\xDC \xDB\xDB\xDB\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "               \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB   \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "               \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDC\xDC\xDB\xDB\xDB\xDC\xDC \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "                         \xDB\xDF      \xDF\xDB                           \n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "                         \xDC       \xDC                            \n", VGA_LIGHT_GREY, VGA_BLACK);
+    // Explicitly rendering the title using the global theme macros
+    printf_color(DEVICE_FB, "                \xDF\xDF\xDF\xDB\xDB\xDC         \xB0\xB0\xB0              \xDF\xDF\xDF\xDB\xDB\xDC  \xDF\xDF\xDF\xDB\xDB\xDC\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "               \xB0\xB0\xB0 \xDB\xDB\xDB         \xB1\xB1\xB1       \xDC\xDC\xDC   \xB0\xB0\xB0 \xDB\xDB\xDB \xB0\xB0\xB0 \xDB\xDB\xDB\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "               \xB1\xB1\xB1             \xB2\xB2\xB2       \xDF\xDF\xDF   \xB1\xB1\xB1 \xDB\xDB\xDB \xB1\xB1\xB1    \n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "               \xDF\xB2\xB2\xDC\xDC\xDC  \xDC\xDB\xDB\xDF\xDB\xDB\xDC \xDB\xDB\xDB      \xDF\xDB\xDB\xDB   \xB2\xB2\xB2 \xDB\xDB\xDB \xDF\xB2\xB2\xDC\xDC\xDC \n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "                   \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB       \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB     \xDB\xDB\xDB\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "                   \xDB\xDB\xDB \xDB\xDB\xDB\xDF\xDF\xDF\xDF \xDB\xDB\xDB       \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB     \xDB\xDB\xDB\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "               \xDC\xDC\xDC \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDC\xDC\xDC   \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB \xDC\xDC\xDC \xDB\xDB\xDB\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "               \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB   \xDB\xDB\xDB   \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB \xDB\xDB\xDB\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "               \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDC\xDC\xDB\xDB\xDB\xDC\xDC \xDF\xDB\xDB\xDC\xDB\xDB\xDF \xDF\xDB\xDB\xDC\xDB\xDB\xDF\n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "                         \xDB\xDF      \xDF\xDB                           \n", DEFAULT_FG, DEFAULT_BG);
+    printf_color(DEVICE_FB, "                         \xDC       \xDC                            \n", DEFAULT_FG, DEFAULT_BG);
     
-    printf_color(DEVICE_FB, "\n\n\n\n", VGA_LIGHT_GREY, VGA_BLACK);
-    printf_color(DEVICE_FB, "                                        \x0A[ Press ENTER to access terminal ]\x07      \n", VGA_LIGHT_GREY, VGA_BLACK);
+    printf_color(DEVICE_FB, "\n\n\n\n", DEFAULT_FG, DEFAULT_BG);
+    
+    // We keep the special inline color codes (\x0A for Light Green, \x07 for Light Grey) 
+    // for the interactive prompt part so it pops!
+    printf_color(DEVICE_FB, "                                        \x0A[ Press ENTER to access terminal ]\x07      \n", DEFAULT_FG, DEFAULT_BG);
 }
-
