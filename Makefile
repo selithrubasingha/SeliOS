@@ -29,6 +29,7 @@ OBJECTS = src/kernel/loader.o \
           src/program.o \
           src/kernel/timer.o \
           src/kernel/utils.o \
+          src/kernel/terminal.o
 
 all: kernel.elf 
 

@@ -1,6 +1,7 @@
 #include "io.h"
 #include "keyboard.h"
 #include "serial.h"
+#include "terminal.h"
 #define KBD_DATA_PORT 0x60
 #define DEVICE_FB 0
 
@@ -62,19 +63,11 @@ unsigned char read_scan_code(void)
 }
 
 void keyboard_handler(){
+    // 1. Grab the raw byte from the motherboard
     unsigned char scan_code = read_scan_code();
 
-    if (scan_code & 0x80) {
-        return;
-}   
-    char ascii = kbd_US[scan_code];
-
-
-    if (ascii != 0) {
-        // Use your serial_write or fb_write to print the character
-        char str[2] = {ascii, '\0'}; // Create a string with the character and null terminator
-        serial_write_string(str);
-        printf(DEVICE_FB, str);
-
-    }
+    // 2. Hand it directly to your new terminal engine!
+    // We don't translate or print it here anymore. terminal.c handles all 
+    // the backspaces, Enter keys, and typing logic.
+    terminal_handle_scan(scan_code);
 }

@@ -61,7 +61,7 @@ active text color to green and then print the rest of the letters using that col
 void putchar(int device, char c) {
     // Elegant Feature: If char is an unprintable control byte between 1 and 15, 
     // dynamically change the active text color inline!
-    if (c >= 1 && c <= 15) {
+    if (c >= 1 && c <= 15 && c !='\n') {
         active_fg = c;
         return;
     }
@@ -82,7 +82,7 @@ void printf_color(int device, const char* str, unsigned char fg, unsigned char b
     
     for (unsigned int i = 0; str[i] != '\0'; i++){
         // If an inline color code override is found inside strings, respect it
-        if (str[i] >= 1 && str[i] <= 15) {
+        if (str[i] >= 1 && str[i] <= 15 && str[i] != '\n') {
             active_fg = str[i];
         } else {
             putchar_color(device, str[i], active_fg, active_bg);

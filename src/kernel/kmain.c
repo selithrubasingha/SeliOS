@@ -13,6 +13,8 @@
 #include "thread.h"
 #include "timer.h"
 #include "utils.h"
+#include "terminal.h"
+
 void kmain(unsigned int ebx) {
     // --- 1. INITIALIZE PAGING FIRST ---
     // The kernel is running in higher-half. We switch to our custom Paging setup.
@@ -90,12 +92,18 @@ void kmain(unsigned int ebx) {
     // Print the masterpiece
     print_lock_screen();
 
-    // Hang the CPU forever so you can admire it
+   // 1. Wait on the lock screen until the keyboard driver updates shell_active
+    while(!shell_active) {
+        asm volatile("hlt");
+    }
+
+    // 2. The user pressed Enter! Clear the art and boot the terminal UI
+    init_terminal();
+
+    // 3. Keep the CPU alive forever to process terminal commands
     while(1) {
         asm volatile("hlt");
     }
-   
-
     // check if GRUB/QEMU actually loaded any modules (Our initrd.img!)
     if (mbinfo->mods_count > 0) {
         // Find the module array provided by GRUB
