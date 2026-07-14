@@ -18,7 +18,7 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/pic.o \
           src/kernel/keyboard.o \
           src/kernel/memory.o \
-            src/kernel/paging.o \
+          src/kernel/paging.o \
           src/kernel/alloc.o \
           src/kernel/initrd.o \
           src/kernel/string.o \
@@ -27,7 +27,8 @@ OBJECTS = src/kernel/loader.o \
           src/kernel/thread.o \
           src/kernel/switch_task.o \
           src/program.o \
-          src/kernel/timer.o
+          src/kernel/timer.o \
+          src/kernel/utils.o \
 
 all: kernel.elf 
 
