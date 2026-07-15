@@ -1,6 +1,7 @@
 #include "terminal.h"
 #include "utils.h"
 #include "string.h"
+#include "fs.h"
 
 int shell_active = 0;
 int enter_pressed = 0;
@@ -10,6 +11,7 @@ static unsigned int buffer_len = 0;
 
 extern unsigned int total_ram_bytes;
 extern unsigned int kernel_size;
+extern fs_node_t *fs_root;  
 
 // Simple keyboard map for raw translation inside the buffer
 static const char kbd_map[128] = {
@@ -112,6 +114,48 @@ void terminal_run_command(const char *cmd) {
         printf(DEVICE_FB, "\x0A  \\___ \\ / _ \\ | | | | \\___ \\  \x07 Architecture: i686-elf\n");
         printf(DEVICE_FB, "\x0A   ___) |  __/ | | |_| |___) | \x07 Target Environment: Ring 0 Kernel\n");
         printf(DEVICE_FB, "\x0A  |____/ \\___|_|_|\\___/|____/  \x07 UI Framework: Text Mode 80x25\n\n");
+    }
+    else if (strcmp(cmd, "ls") == 0) {
+        if (fs_root != NULL) {
+            int i = 0;
+            struct dirent *node = 0;
+            
+            // Loop through directory indices until it returns nothing
+            while ((node = readdir_fs(fs_root, i)) != 0) {
+                // Print the file names in bright Cyan so they look like files!
+                printf(DEVICE_FB, "  \x0B"); 
+                printf(DEVICE_FB, node->name);
+                printf(DEVICE_FB, "\x07\n");
+                i++;
+            }
+        } else {
+            printf(DEVICE_FB, "\x0CVFS not mounted.\x07\n");
+        }
+    }
+    // Hardcoded string check: Does it start with "cat " ?
+    else if (cmd[0] == 'c' && cmd[1] == 'a' && cmd[2] == 't' && cmd[3] == ' ') {
+        if (fs_root != NULL) {
+            // Extract the filename by reading the string starting at index 4
+            char *filename = (char *)&cmd[4]; 
+            
+            // Search the VFS for the file
+            fs_node_t *file_node = finddir_fs(fs_root, filename);
+
+            if (file_node != NULL) {
+                char buffer[256];
+                // Read the file's contents into our buffer
+                unsigned int bytes_read = read_fs(file_node, 0, 255, buffer);
+                buffer[bytes_read] = '\0'; // Safely cap the string
+                
+                // Print the file contents!
+                printf(DEVICE_FB, buffer);
+                printf(DEVICE_FB, "\n");
+            } else {
+                printf(DEVICE_FB, "\x0CError: File '");
+                printf(DEVICE_FB, filename);
+                printf(DEVICE_FB, "' not found in root directory.\x07\n");
+            }
+        }
     }
     else {
         // Use inline color \x0C (Red) for the warning, print the cmd, then switch back to \x07 (Grey)

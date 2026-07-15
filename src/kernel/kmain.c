@@ -18,6 +18,8 @@
 // Add these to the top of kmain.c
 unsigned int total_ram_bytes = 0;
 unsigned int kernel_size = 0;
+fs_node_t *fs_root = NULL;
+
 
 void kmain(unsigned int ebx) {
     // --- 1. INITIALIZE PAGING FIRST ---
@@ -101,13 +103,6 @@ void kmain(unsigned int ebx) {
         asm volatile("hlt");
     }
 
-    // 2. The user pressed Enter! Clear the art and boot the terminal UI
-    init_terminal();
-
-    // 3. Keep the CPU alive forever to process terminal commands
-    while(1) {
-        asm volatile("hlt");
-    }
     // check if GRUB/QEMU actually loaded any modules (Our initrd.img!)
     if (mbinfo->mods_count > 0) {
         // Find the module array provided by GRUB
@@ -118,29 +113,20 @@ void kmain(unsigned int ebx) {
         printf(DEVICE_FB, "Initrd loaded at memory address...\n");
 
         // 2. Initialize the RAM Disk driver you wrote!
-        fs_node_t *fs_root = initialize_initrd(initrd_location);
+        fs_root = initialize_initrd(initrd_location);
 
-        // 3. Search for the file using the VFS switchboard
-        fs_node_t *hello_node = finddir_fs(fs_root, "hello.txt");
-
-        if (hello_node != NULL) {
-            char buffer[256];
-            
-            // 4. Read the file using the VFS switchboard
-            unsigned int bytes_read = read_fs(hello_node, 0, 255, buffer);
-            buffer[bytes_read] = '\0'; // Null-terminate the string safely
-            
-            // 5. Print it to the screen! 
-            // printf(DEVICE_FB, "Read from file: ");
-            // printf(DEVICE_FB, buffer);
-            // printf(DEVICE_FB, "\n");
-        } else {
-            printf(DEVICE_FB, "ERROR: hello.txt not found!\n");
-        }
+       
     } else {
         printf(DEVICE_FB, "ERROR: No GRUB modules loaded!\n");
     }
 
+    // 2. The user pressed Enter! Clear the art and boot the terminal UI
+    init_terminal();
+
+    // 3. Keep the CPU alive forever to process terminal commands
+    while(1) {
+        asm volatile("hlt");
+    }
 
     printf(DEVICE_FB, "\n--- FIRING SYSTEM CALL FROM KERNEL MODE ---\n");
     
