@@ -15,6 +15,10 @@
 #include "utils.h"
 #include "terminal.h"
 
+// Add these to the top of kmain.c
+unsigned int total_ram_bytes = 0;
+unsigned int kernel_size = 0;
+
 void kmain(unsigned int ebx) {
     // --- 1. INITIALIZE PAGING FIRST ---
     // The kernel is running in higher-half. We switch to our custom Paging setup.
@@ -43,13 +47,13 @@ void kmain(unsigned int ebx) {
     // 1. Calculate the Kernel boundaries using the C Trick!
     // unsigned int phys_start = (unsigned int) &kernel_physical_start;
     // unsigned int phys_end   = (unsigned int) &kernel_physical_end;
-    unsigned int kernel_size = phys_end - phys_start;
+    kernel_size = phys_end - phys_start;
 
     
 
     // 2. Read the total RAM from GRUB!
     // GRUB gives us memory in Kilobytes. Multiply by 1024 to get raw Bytes!
-    unsigned int total_ram_bytes = (mbinfo->mem_lower + mbinfo->mem_upper) * 1024;
+    total_ram_bytes = (mbinfo->mem_lower + mbinfo->mem_upper) * 1024;
 
     // Setup the Physical Memory Manager!
     init_memory(total_ram_bytes, phys_start, phys_end);

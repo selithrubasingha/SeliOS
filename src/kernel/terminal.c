@@ -8,6 +8,9 @@ int enter_pressed = 0;
 static char input_buffer[BUFFER_MAX];
 static unsigned int buffer_len = 0;
 
+extern unsigned int total_ram_bytes;
+extern unsigned int kernel_size;
+
 // Simple keyboard map for raw translation inside the buffer
 static const char kbd_map[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
@@ -25,6 +28,8 @@ void init_terminal() {
     buffer_len = 0;
     input_buffer[0] = '\0';
 }
+
+
 
 void terminal_handle_scan(unsigned char scancode) {
     // Check if it's a key release event (break code)
@@ -74,13 +79,15 @@ void terminal_handle_scan(unsigned char scancode) {
     }
 }
 
+
 void terminal_run_command(const char *cmd) {
     if (strcmp(cmd, "help") == 0) {
         printf(DEVICE_FB, "Available commands:\n");
-        printf(DEVICE_FB, "  \x0Bhelp\x07     - Display this command dictionary.\n");
-        printf(DEVICE_FB, "  \x0B" "clear\x07    - Clear the VGA display buffer.\n");
-        printf(DEVICE_FB, "  \x0B" "whoami\x07   - Reveal current system privileges.\n");
-        printf(DEVICE_FB, "  \x0B" "selifetch\x07- Output modern system architecture stats.\n");
+        printf(DEVICE_FB, "  \x0Bhelp\x07      - Display this command dictionary.\n");
+        printf(DEVICE_FB, "  \x0B" "clear\x07     - Clear the VGA display buffer.\n");
+        printf(DEVICE_FB, "  \x0B" "whoami\x07    - Reveal current system privileges.\n");
+        printf(DEVICE_FB, "  \x0B" "selifetch\x07 - Output modern system architecture stats.\n");
+        printf(DEVICE_FB, "  \x0B" "memory\x07    - Display physical RAM and Kernel footprint.\n");
     } 
     else if (strcmp(cmd, "clear") == 0) {
         clear_screen();
@@ -88,11 +95,22 @@ void terminal_run_command(const char *cmd) {
     else if (strcmp(cmd, "whoami") == 0) {
         printf(DEVICE_FB, "root (Ring 0 - Full Kernel Clearances)\n");
     }
+    else if (strcmp(cmd, "memory") == 0) {
+        printf(DEVICE_FB, "\x0B=== System Memory Intelligence ===\x07\n");
+        
+        printf(DEVICE_FB, "Total RAM Available : ");
+        print_hex(total_ram_bytes);
+        printf(DEVICE_FB, " Bytes\n");
+        
+        printf(DEVICE_FB, "Kernel Footprint    : ");
+        print_hex(kernel_size);
+        printf(DEVICE_FB, " Bytes\n\n");
+    }
     else if (strcmp(cmd, "selifetch") == 0) {
-        printf(DEVICE_FB, "\x0A   ____       _ _  ___  ____   \x07 Host: Lenovo Legion Pro 5");
-        printf(DEVICE_FB, "\x0A  / ___|  ___| (_)/ _ \\/ ___|  \x07 OS:   SeliOS x86 Microkernel");
-        printf(DEVICE_FB, "\x0A  \\___ \\ / _ \\ | | | | \\___ \\  \x07 Architecture: i686-elf");
-        printf(DEVICE_FB, "\x0A   ___) |  __/ | | |_| |___) | \x07 Target Environment: Ring 0 Kernel");
+        printf(DEVICE_FB, "\x0A   ____       _ _  ___  ____   \x07 Host: Lenovo Legion Pro 5\n");
+        printf(DEVICE_FB, "\x0A  / ___|  ___| (_)/ _ \\/ ___|  \x07 OS:   SeliOS x86 Microkernel\n");
+        printf(DEVICE_FB, "\x0A  \\___ \\ / _ \\ | | | | \\___ \\  \x07 Architecture: i686-elf\n");
+        printf(DEVICE_FB, "\x0A   ___) |  __/ | | |_| |___) | \x07 Target Environment: Ring 0 Kernel\n");
         printf(DEVICE_FB, "\x0A  |____/ \\___|_|_|\\___/|____/  \x07 UI Framework: Text Mode 80x25\n\n");
     }
     else {
