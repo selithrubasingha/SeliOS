@@ -12,7 +12,7 @@ static unsigned int buffer_len = 0;
 extern unsigned int total_ram_bytes;
 extern unsigned int kernel_size;
 extern fs_node_t *fs_root;  
-
+extern volatile int matrix_active;
 // Simple keyboard map for raw translation inside the buffer
 static const char kbd_map[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
@@ -36,6 +36,21 @@ void init_terminal() {
 void terminal_handle_scan(unsigned char scancode) {
     // Check if it's a key release event (break code)
     if (scancode & 0x80) return;
+
+
+    if (matrix_active) {
+        char ascii = kbd_map[scancode];
+        if (ascii == 'q') {
+            matrix_active = 0; // Kill the threads instantly
+            clear_screen();
+            printf(DEVICE_FB, "\n\x0B[ Concurrency Engine Halted ]\x07\n\n");
+            if (shell_active) {
+                printf(DEVICE_FB, "selith@SeliOS / # ");
+            }
+        }
+        return; // Ignore all other keys while matrix is running
+    }
+
 
     // Enter Key pressed
     if (scancode == 0x1C) {
@@ -156,6 +171,11 @@ void terminal_run_command(const char *cmd) {
                 printf(DEVICE_FB, "' not found in root directory.\x07\n");
             }
         }
+    }
+    else if (strcmp(cmd, "matrix") == 0) {
+        printf(DEVICE_FB, "\n\x0B[ Initializing Preemptive Scheduler Showcase ]\x07\n");
+        printf(DEVICE_FB, "Press 'q' to halt hardware execution...\n\n");
+        matrix_active = 1; // Wake up Task A and Task B!
     }
     else {
         // Use inline color \x0C (Red) for the warning, print the cmd, then switch back to \x07 (Grey)

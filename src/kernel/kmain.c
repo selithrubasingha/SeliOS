@@ -21,6 +21,11 @@ unsigned int kernel_size = 0;
 fs_node_t *fs_root = NULL;
 
 
+extern void task_a();
+extern void task_b();
+
+volatile int matrix_active = 0;
+
 void kmain(unsigned int ebx) {
     // --- 1. INITIALIZE PAGING FIRST ---
     // The kernel is running in higher-half. We switch to our custom Paging setup.
@@ -122,6 +127,11 @@ void kmain(unsigned int ebx) {
 
     // 2. The user pressed Enter! Clear the art and boot the terminal UI
     init_terminal();
+
+    init_threads();
+    create_user_thread(task_a);
+    create_user_thread(task_b);
+    init_timer(100);
 
     // 3. Keep the CPU alive forever to process terminal commands
     while(1) {

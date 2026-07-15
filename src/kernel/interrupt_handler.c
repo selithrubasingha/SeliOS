@@ -6,6 +6,9 @@
 
 #define DEVICE_FB     0
 
+extern volatile int matrix_active;
+
+
 void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_state stack) {
     // The CPU is paused. Decide what to do based on 'intr_no'
 
@@ -43,7 +46,10 @@ void interrupt_handler(struct cpu_state cpu, unsigned int intr_no, struct stack_
         // It's a hardware interrupt, but not the keyboard.
         if (intr_no == 32) {
             // It's the timer interrupt! Call the scheduler to switch threads.
-            //thread_yield();
+
+            if (matrix_active) {
+                thread_yield();
+            }
         }
     }
     else {
