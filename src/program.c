@@ -12,7 +12,7 @@ void task_a() {
         
         if (matrix_active) {
             // VIP Access: Call the kernel functions directly!
-            printf(DEVICE_FB, "\x0A" "1   \x07");
+            printf(DEVICE_FB, "\x02" "1   \x07");
             
             // Artificial delay so the human eye can see the matrix
             for(volatile int i=0; i<800000; i++); 
@@ -29,7 +29,7 @@ void task_b() {
         
         if (matrix_active) {
             // VIP Access: Call the kernel functions directly!
-            printf(DEVICE_FB, "\x0A" "  0 \x07");
+            printf(DEVICE_FB, "\x02" "  0 \x07");
             
             for(volatile int i=0; i<800000; i++); 
         } else {
