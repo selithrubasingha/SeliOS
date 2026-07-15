@@ -129,8 +129,8 @@ void kmain(unsigned int ebx) {
     init_terminal();
 
     init_threads();
-    create_user_thread(task_a);
-    create_user_thread(task_b);
+    create_thread(task_a);
+    create_thread(task_b);
     init_timer(100);
 
     // 3. Keep the CPU alive forever to process terminal commands

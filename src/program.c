@@ -1,37 +1,40 @@
 // program.c
+// program.c
 
+#include "kernel/utils.h"
+#include "kernel/thread.h"
 // Tell program.c to look for the master switch in kmain.c
 extern volatile int matrix_active;
 
 void task_a() {
-    // Print a Light Green '1' with trailing spaces
-    char *msg = "\x0A" "1   \x07"; 
     while (1) {
+        asm volatile("sti"); // Keep the timer hardware enabled
+        
         if (matrix_active) {
-            // System call to print (eax = 1)
-            asm volatile("int $0x80" : : "a"(1), "b"(msg));
+            // VIP Access: Call the kernel functions directly!
+            printf(DEVICE_FB, "\x0A" "1   \x07");
             
             // Artificial delay so the human eye can see the matrix
             for(volatile int i=0; i<800000; i++); 
         } else {
-            // SAFE YIELD: Ask the kernel to switch threads (eax = 3)
-            asm volatile("int $0x80" : : "a"(3)); 
+            // VIP Access: Yield directly!
+            thread_yield();
         }
     }
 }
 
 void task_b() {
-    // Print a Light Green '0'
-    char *msg = "\x0A" "  0 \x07"; 
     while (1) {
+        asm volatile("sti"); // Keep the timer hardware enabled
+        
         if (matrix_active) {
-            // System call to print (eax = 1)
-            asm volatile("int $0x80" : : "a"(1), "b"(msg));
+            // VIP Access: Call the kernel functions directly!
+            printf(DEVICE_FB, "\x0A" "  0 \x07");
             
             for(volatile int i=0; i<800000; i++); 
         } else {
-            // SAFE YIELD: Ask the kernel to switch threads (eax = 3)
-            asm volatile("int $0x80" : : "a"(3)); 
+            // VIP Access: Yield directly!
+            thread_yield();
         }
     }
 }
