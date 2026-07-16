@@ -11,17 +11,22 @@ No standard C libraries. No underlying host OS. Just pure, bare-metal hardware p
 
 Custom CP437 ASCII art lock screen rendered directly to VGA memory, protected by a keyboard hardware interrupt trap.
 
+![image](/images/mainscreen.png)
 
 ### The Interactive Shell
 
 A fully operational Ring 0 terminal engine featuring dynamic hex color parsing, memory intelligence, and VFS file reading.
 
+![image](/images/terminal.png)
 
 ### The Preemptive Concurrency Engine
 
 The `matrix` command unleashes the PIT hardware timer to rapidly context-switch between kernel threads, proving the preemptive scheduler works flawlessly.
 
 
+<video autoplay loop muted playsinline width="100%">
+  <source src="images/matrix_vid.mp4" type="video/mp4">
+</video>
 ---
 
 ## 🚀 Core Architecture & Features
