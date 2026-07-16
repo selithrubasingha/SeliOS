@@ -24,9 +24,7 @@ A fully operational Ring 0 terminal engine featuring dynamic hex color parsing, 
 The `matrix` command unleashes the PIT hardware timer to rapidly context-switch between kernel threads, proving the preemptive scheduler works flawlessly.
 
 
-<video autoplay loop muted playsinline width="100%">
-  <source src="images/matrix_vid.mp4" type="video/mp4">
-</video>
+![matrix_vid](/images/matrix_vid.gif)
 ---
 
 ## 🚀 Core Architecture & Features
