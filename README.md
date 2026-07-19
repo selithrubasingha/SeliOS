@@ -1,25 +1,29 @@
 
-# SeliOS: The Legendary x86 Microkernel
+# SeliOS: The Legendary Self Built OS  
 
-SeliOS is a custom, 32-bit x86 operating system built entirely from scratch in C and Assembly. What started as an exploration of *The Little OS Book* evolved into a full-fledged microkernel architecture featuring preemptive multitasking, a virtual file system, hardware interrupt handling, and a highly customized interactive VGA terminal.
+* SeliOS is a custom, 32-bit x86 operating system built entirely from scratch in C and Assembly.
 
-No standard C libraries. No underlying host OS. Just pure, bare-metal hardware programming.
+* What started as an exploration of *The Little OS Book* evolved into a full-fledged microkernel architecture featuring preemptive multitasking, a virtual file system, hardware interrupt handling, and a awesome terminal.
+
+* No standard C libraries (LIterally had write my own stdlib and stdio methods).
+
+* No underlying host OS. Just pure, bare-metal hardware programming.
 
 ## 📸 Visual Showcase
 
 ### The Boot Sequence
 
-Custom CP437 ASCII art lock screen rendered directly to VGA memory, protected by a keyboard hardware interrupt trap.
+Custom ASCII art lock screen rendered directly to VGA memory, (I just thought adding weird ascii fonts are cool)
 
 ![image](/images/mainscreen.png)
 
 ### The Interactive Shell
 
-A fully operational Ring 0 terminal engine featuring dynamic hex color parsing, memory intelligence, and VFS file reading.
+A fully operational Ring 0 terminal engine featuring dynamic hex color parsing, and VFS file reading.
 
 ![image](/images/terminal.png)
 
-### The Preemptive Concurrency Engine
+###  Concurrency !
 
 The `matrix` command unleashes the PIT hardware timer to rapidly context-switch between kernel threads, proving the preemptive scheduler works flawlessly.
 
@@ -28,6 +32,8 @@ The `matrix` command unleashes the PIT hardware timer to rapidly context-switch 
 ---
 
 ## 🚀 Core Architecture & Features
+
+*(lot's of bit stuff . it's interesting to see how all the 32 bits in addresses are used for many many different actions)*
 
 * **Boot & System Tables:** Custom GRUB multiboot loader, Global Descriptor Table (GDT), and Interrupt Descriptor Table (IDT).
 * **Hardware Interrupts:** Programmable Interrupt Controller (PIC) mapping, custom keyboard driver, and PIT timer routing.
